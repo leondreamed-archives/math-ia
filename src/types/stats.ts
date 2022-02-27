@@ -13,4 +13,5 @@ export type RaceStatsData = {
 export type WordStats = {
 	word: string;
 	medianWpmRatio: number;
+	dataPoints: number;
 } & WordFeatures;

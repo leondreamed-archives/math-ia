@@ -7,7 +7,7 @@ const wordStats = JSON.parse(
 ) as WordStats[];
 
 for (const wordStat of wordStats) {
-	if (wordStat.medianWpmRatio < 0.5) {
-		console.log(wordStat.word)
+	if (wordStat.medianWpmRatio > 1.75) {
+		console.log(wordStat.word);
 	}
 }

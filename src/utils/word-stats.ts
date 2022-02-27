@@ -61,6 +61,7 @@ export function parseWordDataFromRaceStats() {
 				wordToStatsMap[word]!.push({
 					word,
 					medianWpmRatio: wpmRatio,
+					dataPoints: 0,
 					...features,
 				});
 			}
@@ -88,6 +89,7 @@ export function parseWordDataFromRaceStats() {
 		}
 
 		summaryWordStats.medianWpmRatio = medianWpmRatio;
+		summaryWordStats.dataPoints = stats.length;
 
 		finalWordStats.push(summaryWordStats);
 	}

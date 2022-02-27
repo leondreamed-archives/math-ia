@@ -1,13 +1,12 @@
 import fs from 'node:fs';
 import { jsonl } from 'js-jsonl';
-import jsonlines from 'jsonlines';
 import { getRaceStatsFilePaths, getWordStatsFilePath } from '~/utils/paths.js';
 import type { RaceStatsData } from '~/types/stats.js';
 import type { WordFeatures } from '~/types/features.js';
 
 type WordStats = {
 	word: string;
-	medianWpm: number;
+	medianWpmRatio: number;
 } & WordFeatures;
 
 export function parseWordDataFromRaceStats() {
@@ -19,15 +18,26 @@ export function parseWordDataFromRaceStats() {
 		const raceStatsJsonl = fs.readFileSync(raceStatsFilePath, 'utf-8');
 		const raceStats = jsonl.parse<RaceStatsData>(raceStatsJsonl);
 
+		// Get average wpm of all words in the race
+
 		for (const raceStat of raceStats) {
+			let totalWpm = 0;
+			for (const { actualWpm } of raceStat.words) {
+				totalWpm += actualWpm;
+			}
+
+			const averageWpm = totalWpm / raceStat.words.length;
+
 			for (const { word, actualWpm, features } of raceStat.words) {
 				if (wordToStatsMap[word] === undefined) {
 					wordToStatsMap[word] = [];
 				}
 
+				const wpmRatio = actualWpm / averageWpm;
+
 				wordToStatsMap[word]!.push({
 					word,
-					medianWpm: actualWpm,
+					medianWpmRatio: wpmRatio,
 					...features,
 				});
 			}
@@ -39,25 +49,25 @@ export function parseWordDataFromRaceStats() {
 	for (const [_word, stats] of Object.entries(wordToStatsMap)) {
 		const summaryWordStats = { ...stats[0] } as WordStats;
 		const sortedStatsByWpms = [...stats].sort(
-			(a, b) => a.medianWpm - b.medianWpm
+			(a, b) => a.medianWpmRatio - b.medianWpmRatio
 		);
 
-		let medianWpm;
+		let medianWpmRatio;
 		if (sortedStatsByWpms.length % 2 === 0) {
-			medianWpm =
-				(sortedStatsByWpms[sortedStatsByWpms.length / 2 - 1]!.medianWpm +
-					sortedStatsByWpms[sortedStatsByWpms.length / 2]!.medianWpm) /
+			medianWpmRatio =
+				(sortedStatsByWpms[sortedStatsByWpms.length / 2 - 1]!.medianWpmRatio +
+					sortedStatsByWpms[sortedStatsByWpms.length / 2]!.medianWpmRatio) /
 				2;
 		} else {
-			medianWpm =
-				sortedStatsByWpms[Math.floor(sortedStatsByWpms.length / 2)]!.medianWpm;
+			medianWpmRatio =
+				sortedStatsByWpms[Math.floor(sortedStatsByWpms.length / 2)]!
+					.medianWpmRatio;
 		}
 
-		summaryWordStats.medianWpm = medianWpm;
+		summaryWordStats.medianWpmRatio = medianWpmRatio;
 
 		finalWordStats.push(summaryWordStats);
 	}
 
 	fs.writeFileSync(getWordStatsFilePath(), JSON.stringify(finalWordStats));
 }
-

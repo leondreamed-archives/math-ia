@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage{titling}
 \usepackage{amsmath}
+\usepackage{ragged2e}
 
 \title{Using Machine Learning to Predict Typing Speed\vspace{-3em}}
 \author{} % Anonymous because IB
@@ -71,6 +72,10 @@ Using this standard finger map, when typing the word \texttt{mummy} on the QWERT
 
 The characteristics of how difficult a word is to type extends beyond these two examples, and each characteristic has a different amount of influence on how quickly I type the word. In order to determine the significance of these various characteristics in the difficulty of a word, machine learning can be applied.
 
+\section{Gathering Data}
+
+In order to create a machine learning algorithm that predicts how fast I can type a certain text based on the text features, we need to collect a large amount of data that includes various texts and the speed at which I type them. Luckily,
+
 \section*{Analyzing Data}
 
 \begin{figure}
@@ -95,21 +100,105 @@ For example, if there are two features that influence the difficulty of a word w
 	\item The number of capital letters in the word.
 	\item The number of characters in the word.
 	\item The number of sets of "double letters" in the word. For example, the word "sheep" has 1 set of double letters, and the word "bittersweet" has two sets of double letters.
-	\item The number of letters in the home row of the keyboard.
+	\item The number of letters in the home row of the keyboard (the row with the letters "asdf" on the QWERTY layout).
 	\item The number of letters that require pressing the "Shift" key to type.
-	\item The amount of times the same finger is used to type consecutive letters in the word. For example, the word "mummy" requires using the right index finger five times in a row.
+	\item The amount of times the same finger is used to type consecutive letters in the word. For example, the word "mummy" requires using the right index finger five times in a row on a QWERTY layout.
 	\item The number of letters typed with the left hand.
 	\item The number of letters typed with the right hand.
 \end{itemize}
 
-\begin{tabularx}{\linewidth}{|X|X|X|X|X|X|}
-	Word &
-	Is word common? &
-	\# of Capitals &
-	\# of Double Letters
+\textbf{Note:} The data in the following tables might not match with the data you'd expect on a QWERTY layout, and that's because when analyzing my typing data, I based it off the keyboard layout that I use—the Programmer Dvorak layout—which looks like this:
+
+% \begin{noindent}
+\begin{pycode}
+word1 = {"word":"profession ","medianWpm":154.134295227525,"isWordCommon":0,"numCapitalLetters":0,"numConsecutiveFingers":1,"numDoubleLetters":1,"numHomeRowLetters":7,"numLeftHandLetters":5,"numNumbers":0,"numRightHandLetters":5,"numShiftedLetters":0,"wordLength":11}
+
+word2 = {"word":"Table, ","medianWpm":136.84411614875188,"isWordCommon":1,"numCapitalLetters":1,"numConsecutiveFingers":0,"numDoubleLetters":0,"numHomeRowLetters":2,"numLeftHandLetters":3,"numNumbers":0,"numRightHandLetters":3,"numShiftedLetters":1,"wordLength":7}
+
+word3 = {"word":"1950s, ","medianWpm":81.3953488372093,"isWordCommon":0,"numCapitalLetters":0,"numConsecutiveFingers":0,"numDoubleLetters":0,"numHomeRowLetters":1,"numLeftHandLetters":4,"numNumbers":4,"numRightHandLetters":2,"numShiftedLetters":4,"wordLength":7}
+
+def get_table_1_row(w):
+	return f"""
+		\\\\\\hline
+		"{w['word']}" &
+		{w['wordLength']} &
+		{w['numCapitalLetters']} &
+		{w['numConsecutiveFingers']} &
+		{w['numDoubleLetters']} &
+		{w['numHomeRowLetters']}
+	"""
+
+def get_table_2_row(w):
+	return f"""
+		\\\\\\hline
+		"{w['word']}" &
+		{w['numLeftHandLetters']} &
+		{w['numRightHandLetters']} &
+		{w['numNumbers']} &
+		{w['numShiftedLetters']} &
+		{w['isWordCommon']} &
+		{"%.2f" % w['medianWpm']}
+	"""
+\end{pycode}
+% \end{noindent}
+
+\begin{table}[hbt!]
+	\caption{Three examples of features in words}
+	\begin{tabularx}{\linewidth}{|
+			p{70pt}|
+			>{\RaggedRight}X|
+			>{\RaggedRight}X|
+			>{\RaggedRight}X|
+			>{\RaggedRight}X|
+			>{\RaggedRight}X|
+			>{\RaggedRight}X|
+		}
+		\hline
+
+		Word                               &
+		\# of Characters                   &
+		\# of Capitals                     &
+		\# of Same-Finger Consecutive Keys &
+		\# of Double Letters               &
+		\# of Home Row Letters
+
+		\py{get_table_1_row(word1)}
+		\py{get_table_1_row(word2)}
+		\py{get_table_1_row(word3)}
+		\\\hline
+	\end{tabularx}
+
+	\begin{tabularx}{\linewidth}{|
+			p{70pt}|
+			>{\RaggedRight}X|
+			>{\RaggedRight}X|
+			>{\RaggedRight}X|
+			>{\RaggedRight}X|
+			>{\RaggedRight}X|
+			>{\RaggedRight}X|
+			>{\RaggedRight}X|
+		}
+		\hline
+
+		Word                          &
+		\# of Left Hand Letters       &
+		\# of Right Hand Letters      &
+		\# of Numbers                 &
+		\# of Letters Requiring Shift &
+		Is word common?               &
+		Median WPM
+
+		\py{get_table_2_row(word1)}
+		\py{get_table_2_row(word2)}
+		\py{get_table_2_row(word3)}
+		\\\hline
+	\end{tabularx}
+\end{table}
 
 
-{"word":"profession ","medianWpm":154.134295227525,"isWordCommon":0,"leftHandFingerLettersDistribution":{"index":2,"middle":1,"ring":2,"pinky":0},"numCapitalLetters":0,"numConsecutiveFingers":1,"numDoubleLetters":0,"numHomeRowLetters":0,"numLeftHandLetters":5,"numNumbers":0,"numRightHandFingerLettersDistribution":5,"numRightHandLetters":5,"numShiftedLetters":0,"wordLength":11}
-\end{tabularx}
+\begin{figure}[hbt!]
+	\caption{The Programmer Dvorak Keyboard Layout}
+	\includegraphics[width=\textwidth]{programmer-dvorak.png}
+\end{figure}
 
 \end{document}

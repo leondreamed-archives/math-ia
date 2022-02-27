@@ -41,9 +41,19 @@ export async function parseRaceStatsFromTypingLogs() {
 		const wordKeystrokes: WordKeystrokes[] = [];
 
 		let curWordKeystrokes: WordKeystrokes | undefined;
-		for (const keystroke of typingLog.keystrokes) {
+		for (let i = 0; i < typingLog.keystrokes.length; i += 1) {
+			const keystroke = typingLog.keystrokes[i]!;
+			const prevKeystroke = typingLog.keystrokes[i - 1];
+
 			// A keyIndex of 0 represents the start of a new word
-			if (keystroke.keyIndex === 0 && curWordKeystrokes !== undefined) {
+			if (
+				keystroke.keyIndex === 0 &&
+				(prevKeystroke === undefined ||
+					(prevKeystroke !== undefined &&
+						prevKeystroke.key === ' ' &&
+						prevKeystroke.type === 'add')) &&
+				curWordKeystrokes !== undefined
+			) {
 				// We count the space after each word a part of the word that comes before it
 				// This is because if you make a typo (e.g. `thee` instead of `the`, you should be penalized for
 				// the word "the" instead of the next word because you didn't type the word "the" correctly and added

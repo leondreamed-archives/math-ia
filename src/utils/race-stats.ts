@@ -7,18 +7,8 @@ import {
 	getRaceStatsFilePaths,
 	getTypingLogsFilePaths,
 } from '~/utils/paths.js';
-import type { WordFeatures } from '~/types/features.js';
 import { getWpmFromKeystrokes } from '~/utils/typing-log.js';
-
-type RaceData = {
-	raceId: number;
-	words: Array<{
-		word: string;
-		features: WordFeatures;
-		actualWpm: number;
-		time: number;
-	}>;
-};
+import type { RaceStatsData } from '~/types/stats.js';
 
 export async function parseRaceStatsFromTypingLogs() {
 	const typingLogsFilePath = getTypingLogsFilePaths();
@@ -84,7 +74,7 @@ export async function parseRaceStatsFromTypingLogs() {
 			curWordKeystrokes = undefined;
 		}
 
-		const raceData = { raceId, words: [] } as RaceData;
+		const raceData = { raceId, words: [] } as RaceStatsData;
 		// We skip the very first word because it incorporates the start time of the race
 		for (const wordKeystroke of wordKeystrokes.slice(1)) {
 			// Don't include non 100% accurate words in the data

@@ -41,3 +41,7 @@ export const getRaceStatsFilePaths = onetime(() =>
 		'data/race-stats-6001-9000.jsonl',
 	].map((jsonlPath) => path.join(getRootPath(), jsonlPath))
 );
+
+export const getWordStatsFilePath = onetime(() =>
+	path.join(getRootPath(), 'data/word-stats.jsonl')
+);

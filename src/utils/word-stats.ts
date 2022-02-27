@@ -16,7 +16,7 @@ type WordStats = {
 
 const monthlyWpmData = JSON.parse(
 	fs.readFileSync(getMonthlyWpmFilePath()).toString()
-) as Array<{ month: number; year: number; monthlyWpm: number }>;
+) as Array<{ month: number; year: number; averageWpm: number }>;
 
 const raceDates = JSON.parse(
 	fs.readFileSync(getRaceDatesFilePath()).toString()
@@ -55,14 +55,14 @@ export function parseWordDataFromRaceStats() {
 				continue;
 			}
 
-			const { monthlyWpm } = result;
+			const { averageWpm } = result;
 
 			for (const { word, actualWpm, features } of raceStat.words) {
 				if (wordToStatsMap[word] === undefined) {
 					wordToStatsMap[word] = [];
 				}
 
-				const wpmRatio = actualWpm / monthlyWpm;
+				const wpmRatio = actualWpm / averageWpm;
 
 				wordToStatsMap[word]!.push({
 					word,

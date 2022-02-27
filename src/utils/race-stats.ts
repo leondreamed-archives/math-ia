@@ -39,6 +39,7 @@ export async function parseRaceStatsFromTypingLogs() {
 			// A keyIndex of 0 represents the start of a new word
 			if (
 				keystroke.keyIndex === 0 &&
+				keystroke.type === 'add' &&
 				(prevKeystroke === undefined ||
 					(prevKeystroke !== undefined &&
 						prevKeystroke.key === ' ' &&

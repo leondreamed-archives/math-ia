@@ -85,7 +85,8 @@ export async function parseRaceStatsFromTypingLogs() {
 		}
 
 		const raceData = { raceId, words: [] } as RaceData;
-		for (const wordKeystroke of wordKeystrokes) {
+		// We skip the very first word because it incorporates the start time of the race
+		for (const wordKeystroke of wordKeystrokes.slice(1)) {
 			// Don't include non 100% accurate words in the data
 			if (
 				wordKeystroke.keystrokes.some(

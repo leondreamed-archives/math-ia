@@ -2,6 +2,8 @@
 \usepackage{pythontex}
 \usepackage{tabularx}
 
+\title{Using machine learning to predict typing speed}
+
 \newcommand{\code}[1]{\texttt{#1}}
 
 \newenvironment{zeroindent}
@@ -9,9 +11,28 @@
   {\par}
 
 \begin{document}
+\maketitle
+
+\section{Background Information}
+
+Machine learning algorithms is For the scope of this investigation, machine learning is
+
+However, not all texts are created equal. Some texts are harder to type than others, whether it's from having longer, more complex words, frequent capital letters, numbers, etc.
+
+Predicting the difficulty of a text is useful. For example, the typing site that I practice on, TypeRacer, will display different sets of texts depending . For example, these are two quotes that can appear in a TypeRacer race:
+
+\textbf{Quote 1}: Supercalifragilisticexpialidocious is Vielle's favorite word to type on TypeRacer.
+\textbf{Quote 2}: For someone who was never meant for this world, I must confess I'm suddenly having a hard time leaving it.
+
+Even though Quote 1 is shorter than Quote 2, the difficult word at the start of Quote 1 makes it significantly more difficult to type.
+
+Currently, the way TypeRacer classifies the difficulty of a newly added quote is through . Each player has an average typing speed that is calculated based on their best scores for each quote, and if the
+
+\section{Data}
 
 
-\section{Data Collection}
+Machine learning needs data in order to make predictions.
+
 Since TypeRacer's API doesn't provide data that's sufficiently
 
 \section{Features}

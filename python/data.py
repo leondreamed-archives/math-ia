@@ -26,5 +26,6 @@ def flatten_word_data(word_data):
 words_data = [flatten_word_data(word_data) for word_data in words_data]
 
 data_frame = pd.DataFrame(words_data)
+data_frame.to_csv('data/temp.csv')
 
 data_frame.corr().to_csv('data/corr.csv')

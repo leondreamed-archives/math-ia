@@ -16,6 +16,7 @@ type RaceData = {
 		word: string;
 		features: WordFeatures;
 		actualWpm: number;
+		time: number;
 	}>;
 };
 
@@ -100,6 +101,10 @@ export async function parseRaceStatsFromTypingLogs() {
 				word: wordKeystroke.word,
 				actualWpm: wordWpm,
 				features: wordFeatures,
+				time: wordKeystroke.keystrokes.reduce(
+					(acc, keystroke) => acc + keystroke.deltaTime,
+					0
+				),
 			});
 		}
 

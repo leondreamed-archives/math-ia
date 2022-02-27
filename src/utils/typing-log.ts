@@ -110,8 +110,7 @@ export function convertCharactersPerMillisecondToWordsPerMinute(
 
 export function getWpmFromKeystrokes(keystrokes: TypingLogKeystroke[]) {
 	let totalTimeMilliseconds = 0;
-	for (let i = 1; i < keystrokes.length; i += 1) {
-		const keystroke = keystrokes[i]!;
+	for (const keystroke of keystrokes) {
 		totalTimeMilliseconds += keystroke.deltaTime;
 	}
 

@@ -11,11 +11,11 @@ word_stats = random.sample(word_stats, 2000)
 ax.scatter(
     [stat["numCapitalLetters"] for stat in word_stats],
     [stat["wordLength"] for stat in word_stats],
-		[stat['medianWpm'] for stat in word_stats]
+		[stat['medianWpmRatio'] for stat in word_stats]
 )
 
 ax.set_xlabel('Number of Capital Letters')
 ax.set_ylabel('Word Length')
-ax.set_zlabel('Median WPM')
+ax.set_zlabel('Median WPM Ratio')
 
 plt.show()

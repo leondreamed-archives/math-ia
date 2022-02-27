@@ -9,3 +9,8 @@ export type RaceStatsData = {
 		time: number;
 	}>;
 };
+
+export type WordStats = {
+	word: string;
+	medianWpmRatio: number;
+} & WordFeatures;

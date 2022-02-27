@@ -7,10 +7,11 @@ word_stats = json.load(open("data/word-stats.json", "r"))
 
 plt.scatter(
     x=[stat["wordLength"] for stat in word_stats],
-    y=[stat["medianWpm"] for stat in word_stats],
+    y=[stat["medianWpmRatio"] for stat in word_stats],
 )
+
 plt.title('Word Length vs. WPM')
 plt.xlabel("Number of Characters in Word")
-plt.ylabel("WPM")
+plt.ylabel("WPM Ratio")
 
 plt.show()

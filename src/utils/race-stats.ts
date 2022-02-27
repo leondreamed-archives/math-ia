@@ -10,6 +10,7 @@ import {
 import { getWpmFromKeystrokes } from '~/utils/typing-log.js';
 import type { RaceStatsData } from '~/types/stats.js';
 
+// eslint-disable-next-line complexity
 export async function parseRaceStatsFromTypingLogs() {
 	const typingLogsFilePath = getTypingLogsFilePaths();
 
@@ -28,6 +29,7 @@ export async function parseRaceStatsFromTypingLogs() {
 		type WordKeystrokes = {
 			word: string;
 			keystrokes: TypingLogKeystroke[];
+			corrupted: boolean;
 		};
 		const wordKeystrokes: WordKeystrokes[] = [];
 
@@ -61,7 +63,20 @@ export async function parseRaceStatsFromTypingLogs() {
 				curWordKeystrokes = {
 					word: '', // Unknown
 					keystrokes: [],
+					corrupted: false,
 				};
+			}
+
+			// If the previous keystroke isn't a space and the current
+			// key index is 0, the typing log is corrupted
+			if (
+				keystroke.keyIndex === 0 &&
+				prevKeystroke !== undefined &&
+				prevKeystroke.keyIndex !== 0 &&
+				prevKeystroke.key !== ' ' &&
+				prevKeystroke.type === 'add'
+			) {
+				curWordKeystrokes.corrupted = true;
 			}
 
 			curWordKeystrokes.keystrokes.push(keystroke);
@@ -78,13 +93,16 @@ export async function parseRaceStatsFromTypingLogs() {
 		const raceData = { raceId, words: [] } as RaceStatsData;
 		// We skip the very first word because it incorporates the start time of the race
 		for (const wordKeystroke of wordKeystrokes.slice(1)) {
+			if (wordKeystroke.corrupted) continue;
+
 			// Don't include non 100% accurate words in the data
 			if (
 				wordKeystroke.keystrokes.some(
 					(keystroke) => keystroke.type === 'remove'
 				)
-			)
+			) {
 				continue;
+			}
 
 			const wordFeatures = getWordFeatures(wordKeystroke.word);
 			const wordWpm = getWpmFromKeystrokes(wordKeystroke.keystrokes);

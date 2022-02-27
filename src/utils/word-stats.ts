@@ -6,13 +6,7 @@ import {
 	getRaceStatsFilePaths,
 	getWordStatsFilePath,
 } from '~/utils/paths.js';
-import type { RaceStatsData } from '~/types/stats.js';
-import type { WordFeatures } from '~/types/features.js';
-
-type WordStats = {
-	word: string;
-	medianWpmRatio: number;
-} & WordFeatures;
+import type { RaceStatsData, WordStats } from '~/types/stats.js';
 
 const monthlyWpmData = JSON.parse(
 	fs.readFileSync(getMonthlyWpmFilePath()).toString()

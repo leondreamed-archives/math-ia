@@ -9,10 +9,10 @@ word_stats = json.load(open("data/word-stats.json", "r"))
 
 plt.scatter(
     x=[stat["numCapitalLetters"] for stat in word_stats],
-    y=[stat["medianWpm"] for stat in word_stats],
+    y=[stat["medianWpmRatio"] for stat in word_stats],
 )
 plt.title('Number of Capital Letters vs. WPM')
 plt.xlabel("Number of Capital Letters")
-plt.ylabel("WPM")
+plt.ylabel("WPM Ratio")
 
 plt.show()

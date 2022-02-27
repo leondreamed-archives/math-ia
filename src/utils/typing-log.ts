@@ -69,7 +69,7 @@ export function parseRawTypingLog({
 		});
 	}
 
-	const keystrokePatternRegex = /(\d+),(\d+)([+-])(.)/g;
+	const keystrokePatternRegex = /(\d+),(\d+)([+\-$])(.)/g;
 
 	const keystrokeMatches = keystrokesString?.matchAll(keystrokePatternRegex);
 

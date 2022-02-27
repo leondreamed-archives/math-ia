@@ -1,7 +1,11 @@
 import fs from 'node:fs';
 import { jsonl } from 'js-jsonl';
 import jsonlines from 'jsonlines';
-import type { TypingLogData, TypingLogKeystroke } from '~/types/typing-log.js';
+import type {
+	TypingLogData,
+	TypingLogKeystroke,
+	TypingLogKeyTime,
+} from '~/types/typing-log.js';
 import { getWordFeatures } from '~/utils/features.js';
 import {
 	getRaceStatsFilePaths,
@@ -86,14 +90,25 @@ export async function parseRaceStatsFromTypingLogs() {
 			curWordKeystrokes.word = curWordKeystrokes.keystrokes
 				.map((keystroke) => keystroke.key)
 				.join('');
+
 			wordKeystrokes.push(curWordKeystrokes);
 			curWordKeystrokes = undefined;
 		}
+
+		const wordsFromKeytimes = typingLog.keyTimes
+			.map((keyTime) => keyTime.key)
+			.join('')
+			.split(' ');
 
 		const raceData = { raceId, words: [] } as RaceStatsData;
 		// We skip the very first word because it incorporates the start time of the race
 		for (const wordKeystroke of wordKeystrokes.slice(1)) {
 			if (wordKeystroke.corrupted) continue;
+
+			if (!wordsFromKeytimes.includes(wordKeystroke.word.trim())) {
+				console.log(`Word ${wordKeystroke.word} not found in keytimes.`);
+				continue;
+			}
 
 			// Don't include non 100% accurate words in the data
 			if (

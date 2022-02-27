@@ -27,10 +27,6 @@ def flatten_word_data(word_data, race_id):
 
 words_data = [flatten_word_data(word_data, stat['raceId']) for stat in race_stats for word_data in stat["words"]]
 
-for word_data in words_data:
-    if word_data["actualWpm"] < 40:
-        print(word_data)
-
 words_df = pd.DataFrame(words_data)
 
 

@@ -7,7 +7,6 @@ export type FingerLettersDistribution = {
 
 export type WordFeatures = {
 	isWordCommon: number;
-	leftHandFingerLettersDistribution: FingerLettersDistribution;
 	numCapitalLetters: number;
 	numDoubleLetters: number;
 	numHomeRowLetters: number;
@@ -15,7 +14,6 @@ export type WordFeatures = {
 	numNumbers: number;
 	numRightHandLetters: number;
 	numShiftedLetters: number;
-	numRightHandFingerLettersDistribution: number;
 	wordLength: number;
 	numConsecutiveFingers: number;
 };

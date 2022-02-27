@@ -30,7 +30,7 @@ export function getWordLength(word: string) {
 }
 
 export function getNumCapitalLetters(word: string) {
-	return word.length - word.replace(/[A-Z]g/, '').length;
+	return word.length - word.replace(/[A-Z]/g, '').length;
 }
 
 export function getNumNumbers(word: string) {
@@ -139,15 +139,12 @@ export function getNumConsecutiveFingers(word: string) {
 export function getWordFeatures(word: string): WordFeatures {
 	return {
 		isWordCommon: getIsWordCommon(word),
-		leftHandFingerLettersDistribution:
-			getLeftHandFingerLettersDistribution(word),
 		numCapitalLetters: getNumCapitalLetters(word),
 		numConsecutiveFingers: getNumConsecutiveFingers(word),
-		numDoubleLetters: getNumCapitalLetters(word),
-		numHomeRowLetters: getNumCapitalLetters(word),
+		numDoubleLetters: getNumDoubleLetters(word),
+		numHomeRowLetters: getNumHomeRowLetters(word),
 		numLeftHandLetters: getNumLeftHandLetters(word),
 		numNumbers: getNumNumbers(word),
-		numRightHandFingerLettersDistribution: getNumRightHandLetters(word),
 		numRightHandLetters: getNumRightHandLetters(word),
 		numShiftedLetters: getNumShiftedLetters(word),
 		wordLength: getWordLength(word),

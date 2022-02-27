@@ -43,5 +43,5 @@ export const getRaceStatsFilePaths = onetime(() =>
 );
 
 export const getWordStatsFilePath = onetime(() =>
-	path.join(getRootPath(), 'data/word-stats.jsonl')
+	path.join(getRootPath(), 'data/word-stats.json')
 );

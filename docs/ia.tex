@@ -71,147 +71,45 @@ Using this standard finger map, when typing the word \texttt{mummy} on the QWERT
 
 The characteristics of how difficult a word is to type extends beyond these two examples, and each characteristic has a different amount of influence on how quickly I type the word. In order to determine the significance of these various characteristics in the difficulty of a word, machine learning can be applied.
 
-\section*{Applying Machine Learning}
+\section*{Analyzing Data}
+
+\begin{figure}
+	\caption{A graph relating the number of capital letters in a word and the speed at which the word is typed.}
+	\includegraphics[width=\textwidth]{capital-letters-vs-wpm.png}
+\end{figure}
+
+In a word, there are many more features other than the word length and the number of capital letters.
 
 \begin{align*}
-\text{Difficulty} = w_1 * (\text{Feature 1}) + w_2 * (\text{Feature 2}) + ... + \text{Bias}
+	\text{Difficulty} = w_1 * (\text{Feature 1}) + w_2 * (\text{Feature 2}) + ... + \text{Bias}
 \end{align*}
 
 For example, if there are two features that influence the difficulty of a word which are the length of the word and the number of capital letters in the word, then the equation would become:
 
 \begin{align*}
-\text{Difficulty} = w_{\text{word length}} * (\text{word length}) + w_{\text{capital letters}} * (\text{\# of capital letters}) + \text{Bias}
+	\text{Difficulty} = w_{\text{word length}} * (\text{word length}) + w_{\text{capital letters}} * (\text{\# of capital letters}) + \text{Bias}
 \end{align*}
 
-
-
-If we measure the difficulty of a word as the speed at which the word is typed (i.e. in the units words per minute), then we arrive at an equation similar to the following:
-
-Since TypeRacer's API doesn't provide data that's sufficiently
-
-\section{Features}
-
-% Script to find average word length of sentences
-% \begin{noindent}
-\begin{pycode}
-import numpy as np
-
-first_sentence = "Someverylongandhardtotypeword and a lot of tiny and short words that are more easy to type."
-second_sentence = "Generally, this sentence contains longer and more complex words, but is overall easier to type."
-
-def get_avg_word_length(sentence: str):
-	return np.mean([len(word) for word in sentence.split(' ')])
-
-def get_avg_word_length_formatted(sentence: str):
-	return "{:.2f}".format(get_avg_word_length(sentence))
-\end{pycode}
-% \end{noindent}
-
-In a quote, there are often certain parts of the quote that are harder than others. Thus, features that take into account averages like the average word length might not accurately reflect a quote. This problem is demonstrated by the following example:
-
-\medskip
-
-\begin{textexamples}
-	\textbf{Quote 1:} \py{first_sentence}
-	\newline
-	Average word length: \py{get_avg_word_length_formatted(first_sentence)} words
-
-	\smallskip
-
-	\textbf{Quote 2:} \py{second_sentence}
-	\newline
-	Average word length: \py{get_avg_word_length_formatted(second_sentence)} words
-\end{textexamples}
-
-\medskip
-
-In the above example, even though Quote 1, has a long word that on its own would be much harder to type, the average word length of the quote overall is.
-
-One possible solution would be analyze each word individually, independent of the others. Then, to predict an overall score, we would sum up the individual speed of each word. However, this approach doesn't account for cases where the words before and after influence the speed at which the word is typed. Consider the following example
-
-\medskip
-
-\begin{textexamples}
-	\textbf{Quote 1:} he HAS a keyboard
-	\textbf{Quote 2:} he has a keyboard
-\end{textexamples}
-
-In the first quote, to type \code{HAS}, I need to use my left pinky finger to hold down the shift key while I press the \code{;} key on using my right hand. Then, to type the letter \code{a}, I need to lift up my pinky finger and move it to the /
-
-% \begin{noindent}
-\begin{pycode}
-row_number = 0
-
-quote_1_wpm = [98, 101, 94, 122, 86]
-quote_1_avg = np.mean(quote_1_wpm)
-
-quote_2_wpm = [119, 143, 120, 140, 115]
-quote_2_avg = np.mean(quote_2_wpm)
-
-def get_table_1_row(index: int):
-	global row_number
-	row_number += 1
-	return f"\\\\\\hline \n {row_number} & {quote_1_wpm[index]} & {quote_2_wpm[index]}"
-\end{pycode}
-% \end{noindent}
-
-\begin{tabularx}{\textwidth}{|X|X|X|}
-	\hline
-
-	Trial \# & Quote 1 WPM      & Quote 2 WPM
-
-	\py{get_table_1_row(0)}
-	\py{get_table_1_row(1)}
-	\py{get_table_1_row(2)}
-	\py{get_table_1_row(3)}
-	\py{get_table_1_row(4)}
-
-	\\\hline
-	Average  & \py{quote_1_avg} & \py{quote_2_avg}
-	\\\hline
-\end{tabularx}
-
-Thus, analyzing the WPM of typing individual words isn't enough.
-
-Instead, we can combine the two above approaches and analyze pairs of words instead, as the speed of a word usually depends on the word before it, since that's usually the word that determines the final locations of finger placements before typing the next word. For example, the following quote:
-
-The quick brown fox jumps
-
-Would be broken down into the following word pairs:
-
-The quick
-quick brown
-brown fox
-fox jumps
-
-Then, using the logs from the race data, we then calculate the wpm of typing each of these word pairs. A dummy result might be:
-
-The quick - 168 wpm
-quick brown - 163 wpm
-brown fox - 164 wpm
-fox jumps - 182 wpm
-
-This process is repeated for every quote and the results are saved. Then, we identify features in each word pair and feed the data into our machine learning algorithm such that it would be able to predict the speed of typing a certain word pair.
-
-To find the average, you first assign the first value to a wpm that's know (i.e. you know how fast typing the individual word would be. This would be another machine learning algorithm of its own: predicting how fast you would type a word if it was the first word of a sentence. I have to use all my quotes but it might not be the most complete data set.).
-
-% \begin{noindent}
-\begin{pycode}
-features = """
-	- How many double letters the word has (double letters are slower to type)
-	- How many characters the word has
-	- Can't measure every letter combination because there's not enough data (e.g. if I wanted to predict how fast I'd type an abbreviation like "nvm", I don't have enough data on words that have the "nv" or "vm" combination).
-	-
-"""
-\end{pycode}
-% \end{noindent}
-
 \begin{itemize}
-	\item The numbers of words in the quote
-	\item The individual word frequencies
-	\item
+	\item Whether the word is common (1 if the word is included within the top 1000 most common English words, and 0 otherwise).
+	\item The number of capital letters in the word.
+	\item The number of characters in the word.
+	\item The number of sets of "double letters" in the word. For example, the word "sheep" has 1 set of double letters, and the word "bittersweet" has two sets of double letters.
+	\item The number of letters in the home row of the keyboard.
+	\item The number of letters that require pressing the "Shift" key to type.
+	\item The amount of times the same finger is used to type consecutive letters in the word. For example, the word "mummy" requires using the right index finger five times in a row.
+	\item The number of letters typed with the left hand.
+	\item The number of letters typed with the right hand.
 \end{itemize}
 
-For the purpose of this analysis, we won't be taking into account word accuracy. This is because accuracy is fairly random: just because I type a word wrong in one race doesn't mean that I usually type that word wrong, and just because I've never typed a word wrong doesn't mean I've mastered it. To eliminate this noise, we'll be disregarding mistyped words from the dataset.
+\begin{tabularx}{\linewidth}{|X|X|X|X|X|X|}
+	Word &
+	Is word common? &
+	\# of Capitals &
+	\# of Double Letters
+
+
+{"word":"profession ","medianWpm":154.134295227525,"isWordCommon":0,"leftHandFingerLettersDistribution":{"index":2,"middle":1,"ring":2,"pinky":0},"numCapitalLetters":0,"numConsecutiveFingers":1,"numDoubleLetters":0,"numHomeRowLetters":0,"numLeftHandLetters":5,"numNumbers":0,"numRightHandFingerLettersDistribution":5,"numRightHandLetters":5,"numShiftedLetters":0,"wordLength":11}
+\end{tabularx}
 
 \end{document}

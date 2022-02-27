@@ -49,3 +49,7 @@ export const getWordStatsFilePath = onetime(() =>
 export const getRaceDatesFilePath = onetime(() =>
 	path.join(getRootPath(), 'data/race-dates.json')
 );
+
+export const getMonthlyWpmFilePath = onetime(() =>
+	path.join(getRootPath(), 'data/monthly-wpm.json')
+);

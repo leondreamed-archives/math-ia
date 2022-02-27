@@ -52,6 +52,7 @@
 	"dependencies": {
 		"@sindresorhus/is": "^4.5.0",
 		"cheerio": "^1.0.0-rc.10",
+		"dayjs": "^1.10.7",
 		"desm": "^1.2.0",
 		"got": "^12.0.1",
 		"js-jsonl": "^1.0.3",

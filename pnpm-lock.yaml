@@ -9,6 +9,7 @@ specifiers:
   '@types/node': ^17.0.21
   '@types/proper-lockfile': ^4.1.2
   cheerio: ^1.0.0-rc.10
+  dayjs: ^1.10.7
   desm: ^1.2.0
   eslint: ^8.10.0
   execa: ^6.1.0
@@ -33,6 +34,7 @@ specifiers:
 dependencies:
   '@sindresorhus/is': 4.5.0
   cheerio: 1.0.0-rc.10
+  dayjs: 1.10.7
   desm: 1.2.0
   got: 12.0.1
   js-jsonl: 1.0.3
@@ -2123,6 +2125,10 @@ packages:
       whatwg-mimetype: 2.3.0
       whatwg-url: 8.7.0
     dev: true
+
+  /dayjs/1.10.7:
+    resolution: {integrity: sha512-P6twpd70BcPK34K26uJ1KT3wlhpuOAPoMwJzpsIWUxHZ7wpmbdZL/hQqBDfz7hGurYSa5PhzdhDHtt319hL3ig==}
+    dev: false
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -6329,12 +6335,15 @@ packages:
     hasBin: true
     dependencies:
       '@eslint/eslintrc': 1.2.0
+      '@typescript-eslint/eslint-plugin': 5.12.1_27a0c788acac7d65514027b167e3b3f6
+      '@typescript-eslint/parser': 5.12.1_eslint@8.10.0+typescript@4.5.5
       arrify: 3.0.0
       cosmiconfig: 7.0.1
       define-lazy-prop: 3.0.0
       eslint: 8.10.0
       eslint-config-prettier: 8.4.0_eslint@8.10.0
       eslint-config-xo: 0.40.0_eslint@8.10.0
+      eslint-config-xo-typescript: 0.50.0_570bf7ac8e47f19836c9e7a7bf125b35
       eslint-formatter-pretty: 4.1.0
       eslint-import-resolver-webpack: 0.13.2_0681d70744620d3a95d8cb23ff3c118d
       eslint-plugin-ava: 13.2.0_eslint@8.10.0

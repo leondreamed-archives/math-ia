@@ -1,6 +1,11 @@
 import fs from 'node:fs';
 import { jsonl } from 'js-jsonl';
-import { getRaceStatsFilePaths, getWordStatsFilePath } from '~/utils/paths.js';
+import {
+	getMonthlyWpmFilePath,
+	getRaceDatesFilePath,
+	getRaceStatsFilePaths,
+	getWordStatsFilePath,
+} from '~/utils/paths.js';
 import type { RaceStatsData } from '~/types/stats.js';
 import type { WordFeatures } from '~/types/features.js';
 
@@ -8,6 +13,18 @@ type WordStats = {
 	word: string;
 	medianWpmRatio: number;
 } & WordFeatures;
+
+const monthlyWpmData = JSON.parse(
+	fs.readFileSync(getMonthlyWpmFilePath()).toString()
+) as Array<{ month: number; year: number; monthlyWpm: number }>;
+
+const raceDates = JSON.parse(
+	fs.readFileSync(getRaceDatesFilePath()).toString()
+) as Array<{ raceId: number; date: string }>;
+
+const raceIdToDate = Object.fromEntries(
+	raceDates.map(({ date, raceId }) => [raceId, new Date(date)])
+);
 
 export function parseWordDataFromRaceStats() {
 	const raceStatsFilePaths = getRaceStatsFilePaths();
@@ -18,22 +35,34 @@ export function parseWordDataFromRaceStats() {
 		const raceStatsJsonl = fs.readFileSync(raceStatsFilePath, 'utf-8');
 		const raceStats = jsonl.parse<RaceStatsData>(raceStatsJsonl);
 
-		// Get average wpm of all words in the race
-
 		for (const raceStat of raceStats) {
-			let totalWpm = 0;
-			for (const { actualWpm } of raceStat.words) {
-				totalWpm += actualWpm;
+			const raceDate = raceIdToDate[raceStat.raceId];
+			if (raceDate === undefined) {
+				throw new Error(`Date for race ${raceStat.raceId} not found.`);
 			}
 
-			const averageWpm = totalWpm / raceStat.words.length;
+			const result = monthlyWpmData.find(
+				({ month, year }) =>
+					month === raceDate.getMonth() && year === raceDate.getFullYear()
+			);
+
+			if (result === undefined) {
+				console.error(
+					`Unknown monthly wpm for month ${raceDate.getMonth()} and year ${raceDate.getFullYear()}, ${
+						raceStat.raceId
+					}`
+				);
+				continue;
+			}
+
+			const { monthlyWpm } = result;
 
 			for (const { word, actualWpm, features } of raceStat.words) {
 				if (wordToStatsMap[word] === undefined) {
 					wordToStatsMap[word] = [];
 				}
 
-				const wpmRatio = actualWpm / averageWpm;
+				const wpmRatio = actualWpm / monthlyWpm;
 
 				wordToStatsMap[word]!.push({
 					word,

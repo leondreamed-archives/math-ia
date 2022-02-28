@@ -72,11 +72,27 @@ Using this standard finger map, when typing the word \texttt{mummy} on the QWERT
 
 The characteristics of how difficult a word is to type extends beyond these two examples, and each characteristic has a different amount of influence on how quickly I type the word. In order to determine the significance of these various characteristics in the difficulty of a word, machine learning can be applied.
 
-\section{Gathering Data}
+\section*{Gathering Data}
 
-In order to create a machine learning algorithm that predicts how fast I can type a certain text based on the text features, we need to collect a large amount of data that includes various texts and the speed at which I type them. Luckily,
+In order to create a machine learning algorithm that predicts how fast I can type a certain text based on the text features, we need to collect a large amount of data that includes various texts and the speed at which I type them. Luckily, I've been using TypeRacer for over 5 years now, and over these 5 years I've typed over 8000 texts on my account.
+
+I created a program that automatically scrapes the race data from all my 8000 races and saves them into a file.
 
 \section*{Analyzing Data}
+
+
+\section*{Predicting Typing Speed}
+
+
+
+The purpose of our machine learning algorithm is to find weights for each feature that most accurately predicts the typing data. However, in order to do this, the algorithm needs a way to know how accurate a certain set of weights are.
+
+\subsection*{The Cost Function}
+
+The cost function will inform our machine learning algorithm how accurate its weights are, and more importantly, how to adjust its weights in order to reduce the cost.
+
+
+
 
 \begin{figure}
 	\caption{A graph relating the number of capital letters in a word and the speed at which the word is typed.}

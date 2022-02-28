@@ -1,11 +1,7 @@
 import fs from 'node:fs';
 import { jsonl } from 'js-jsonl';
 import jsonlines from 'jsonlines';
-import type {
-	TypingLogData,
-	TypingLogKeystroke,
-	TypingLogKeyTime,
-} from '~/types/typing-log.js';
+import type { TypingLogData, TypingLogKeystroke } from '~/types/typing-log.js';
 import { getWordFeatures } from '~/utils/features.js';
 import {
 	getRaceStatsFilePaths,

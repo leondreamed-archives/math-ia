@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+\documentclass[12pt, demo]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{pythontex}
 \usepackage{tabularx}
@@ -80,36 +80,114 @@ I created a program that automatically scrapes the race data from all my 8000 ra
 
 \section*{Analyzing Data}
 
+Thus, to take into consideration the gradual increase in my typing speed overtime, the typing speed of a word should be measured relative to my average speed at the time.
+
+After analyzing the data, I noticed some outliers in the data set. Occasionally, I take a short breather in the middle of a typing race if I'm making too many mistakes, and this is reflected in some of the data as it causes my algorithm to calculate abnormally low speeds for some words. To counter this problem, I decided to take the median of the wpm ratios, as it wouldn't be as affected by outlier data compared to the mean.
 
 \section*{Predicting Typing Speed}
 
+The median wpm ratio of a word depends on various features of the word, such as the length of the word, the amount of capital letters of the word, etc.
 
+For example, if the typing speed of a word was linearly proportional to its length, then our predictive function might look like the following:
 
-The purpose of our machine learning algorithm is to find weights for each feature that most accurately predicts the typing data. However, in order to do this, the algorithm needs a way to know how accurate a certain set of weights are.
+\begin{align}
+	\text{Difficulty} = w_{\text{word length}} * (\text{word length}) + Bias
+\end{align}
+
+However, when we plot the graph of word length against median WPM, we get the following figure:
+
+\begin{figure}
+	\caption{Word Length vs. WPM Ratio}
+	\includegraphics{word-length-vs-wpm.png}
+\end{figure}
+
+The graph indicates that longer words typically have lower WPM Ratios, but the range of WPM ratios for shorter words is much larger. If we filter out words that have a WPM ratio lower than 0.5, we can understand why:
+
+% \begin{noindent}
+\begin{pycode}
+word_stats = [
+	word_stat.strip().split('|') for word_stat in """
+		"If |0.4905423436151009
+		L.A. |0.48295763254168533
+		DOS |0.46217555276196115
+		"No |0.428899294475664
+		'How |0.3993690501499697
+		UBS |0.4679134219795311
+		GROW |0.4646458701500651
+		Six? |0.48037553838088465
+	""".strip().splitlines()
+]
+
+def get_table():
+	table = """
+	{
+		\\begin{center}
+		\\noindent
+		\\begin{tabularx}{
+			0.5\\linewidth
+		}{|X|X|}
+		\\hline
+		Word (wrapped in ``'') & WPM Ratio
+	"""
+	for word_stat in word_stats:
+		table += f"""
+			\\\\\\hline
+			``\\code{{{word_stat[0]}}}'' & {"%.3f" % float(word_stat[1])}
+		"""
+	table += """
+		\\\\\\hline
+		\\end{tabularx}
+		\\end{center}
+	"""
+	return table
+\end{pycode}
+% \end{noindent}
+
+\py{get_table()}
+
+Even though these words are short, they contain capital letters and keys that need you to press the Shift key to type (\code{"} and \code{?}). This makes the word substantially slower to type, and isn't accounted for in Equation x.
+
+Our function must take into account various features of the word that would affect typing speed. Some features, like the number of capital letters, will influence the word's typing speed more compared to other features, like whether the word starts with a vowel or a consonant.
+
+To account for the different influences of different features, we need to assign a different weight to each of them in our equation, which gives us an equation similar to the following:
+
+\begin{align*}
+	f(\text{word}) = w_1 * (\text{Feature 1}) + w_2 * (\text{Feature 2}) + ... + \text{Bias}
+\end{align*}
+
+For example, if the only two features that influence the difficulty of a are the length of the word and the number of capital letters in the word, then the equation would become:
+
+\begin{align*}
+	\text{Difficulty} = w_{\text{word length}} * (\text{word length}) + w_{\text{capital letters}} * (\text{\# of capital letters}) + \text{Bias}
+\end{align*}
+
+% where $w_{\text{word_length}}$ isn't necessarily the same as $w_{\text{capital letters}}$.
+
+How do we find the optimal values of $w_{\text{feature} i}$ that will give us the most accurate function for predicting a word's WPM ratio? This is where machine learning comes in.
+
+\section*{Machine Learning}
 
 \subsection*{The Cost Function}
 
 The cost function will inform our machine learning algorithm how accurate its weights are, and more importantly, how to adjust its weights in order to reduce the cost.
 
-
-
-
-\begin{figure}
-	\caption{A graph relating the number of capital letters in a word and the speed at which the word is typed.}
-	\includegraphics[width=\textwidth]{capital-letters-vs-wpm.png}
-\end{figure}
-
-In a word, there are many more features other than the word length and the number of capital letters.
+One popular cost function used in machine learning is the MSE (Mean Squared Error). This function defines the cost based on the squares of the difference between the actual data ($y_i$) and the predicted data ($f(x_i)$):
 
 \begin{align*}
-	\text{Difficulty} = w_1 * (\text{Feature 1}) + w_2 * (\text{Feature 2}) + ... + \text{Bias}
+	C(x) & = \frac{1}{N}\big[(y_1 - f(x_1))^2 + (y_2 - f(x_2))^2 + ... + (y_n - f(x_n))^2]
+	\\
+	C(x) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(x_i))^2
 \end{align*}
 
-For example, if there are two features that influence the difficulty of a word which are the length of the word and the number of capital letters in the word, then the equation would become:
+A visual example of this cost function would look like:
 
-\begin{align*}
-	\text{Difficulty} = w_{\text{word length}} * (\text{word length}) + w_{\text{capital letters}} * (\text{\# of capital letters}) + \text{Bias}
-\end{align*}
+\includegraphics{mse-cost.png}
+
+The goal of our machine learning algorithm is to minimize this function: to find a set of weights such that $C(x)$ is as low as possible. A popular method for minimizing cost is by using gradient descent.
+
+\subsection*{Gradient Descent}
+
+Gradient descent involves using the derivative of a function to find a function's local minimum.
 
 \begin{itemize}
 	\item Whether the word is common (1 if the word is included within the top 1000 most common English words, and 0 otherwise).

@@ -8,4 +8,3 @@ export async function getTotalNumRaces() {
 	const data = JSON.parse(response.body) as TyperacerGameResponse[];
 	return data[0]?.gn ?? 0;
 }
-

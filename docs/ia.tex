@@ -184,6 +184,22 @@ To visualize this cost function, I've plotted the below data for a small set of 
 
 % \begin{noindent}
 \begin{pycode}
+word_data = [
+	['month.', 6, 1.8523997581589209],
+	['should ', 7, 1.7302841332533008],
+	['meaning.', 8, 1.614390135538142],
+	['singing. ', 9, 1.5007211799003408],
+	['thoughts. ', 10, 1.448833713008257],
+	['standpoint ', 11, 1.3051500032628751],
+]
+
+def get_table_row(row_index: int):
+	return f"""
+		\\\\\\hline
+		``{word_data[row_index][0]}'' &
+		{word_data[row_index][1]} &
+		{"%.3f" % word_data[row_index][2]}
+	"""
 def f3f(number):
 	return "%.3f" % number
 \end{pycode}
@@ -191,33 +207,17 @@ def f3f(number):
 
 \begin{tabularx}{\linewidth}{|X|X|X|}
 	\hline
-	Word            &
-	Word Length     &
+	Word        &
+	Word Length &
 	WPM Ratio
-	\\\hline
-	``month.''      &
-	6               &
-	\py{f3f(1.8523997581589209)}
-	\\\hline
-	``should ''     &
-	7               &
-	\py{f3f(1.7302841332533008)}
-	\\\hline
-	``meaning.''    &
-	8               &
-	\py{f3f(1.614390135538142)}
-	\\\hline
-	``singing. ''   &
-	9               &
-	\py{f3f(1.5007211799003408)}
-	\\\hline
-	``thoughts. ''  &
-	10              &
-	\py{f3f(1.448833713008257)}
-	\\\hline
-	``standpoint '' &
-	11              &
-	\py{f3f(1.3051500032628751)}
+
+	\py{get_table_row(0)}
+	\py{get_table_row(1)}
+	\py{get_table_row(2)}
+	\py{get_table_row(3)}
+	\py{get_table_row(4)}
+	\py{get_table_row(5)}
+
 	\\\hline
 \end{tabularx}
 

@@ -34,6 +34,7 @@ for (let i = 5; i <= 18; i += 1) {
 		);
 
 	wordData.push(...words);
+	console.log(words.map((w) => w.word));
 }
 
 fs.writeFileSync('data/selected-word-stats.json', JSON.stringify(wordData));

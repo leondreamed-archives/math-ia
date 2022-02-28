@@ -78,6 +78,8 @@ In order to create a machine learning algorithm that predicts how fast I can typ
 
 I created a program that automatically scrapes the race data from all my 8000 races and saves them into a file.
 
+% TODO: Why WPM Ratio?
+
 \section*{Analyzing Data}
 
 Thus, to take into consideration the gradual increase in my typing speed overtime, the typing speed of a word should be measured relative to my average speed at the time.
@@ -86,15 +88,16 @@ After analyzing the data, I noticed some outliers in the data set. Occasionally,
 
 \section*{Predicting Typing Speed}
 
-The median wpm ratio of a word depends on various features of the word, such as the length of the word, the amount of capital letters of the word, etc.
+The WPM Ratio of a word depends on various features of the word, such as the length of the word and the amount of capital letters in the word.
 
 For example, if the typing speed of a word was linearly proportional to its length, then our predictive function might look like the following:
-
 \begin{align}
-	\text{Difficulty} = w_{\text{word length}} * (\text{word length}) + Bias
+	\text{WPM Ratio} = w_{\text{word length}} * (\text{word length}) + Bias
 \end{align}
 
-However, when we plot the graph of word length against median WPM, we get the following figure:
+This equation resembles the typical linear equation $y = mx + b$, where $w_{\text{word length}}$ represents the slope, or in other words, the amount that the WPM Ratio increases or decreases by when the word length is increased by 1.
+
+However, when we plot the graph of word length against WPM Ratio, we get the following figure:
 
 \begin{figure}
 	\caption{Word Length vs. WPM Ratio}
@@ -120,7 +123,6 @@ word_stats = [
 
 def get_table():
 	table = """
-	{
 		\\begin{center}
 		\\noindent
 		\\begin{tabularx}{
@@ -163,7 +165,7 @@ For example, if the only two features that influence the difficulty of a are the
 
 % where $w_{\text{word_length}}$ isn't necessarily the same as $w_{\text{capital letters}}$.
 
-How do we find the optimal values of $w_{\text{feature} i}$ that will give us the most accurate function for predicting a word's WPM ratio? This is where machine learning comes in.
+How do we find the optimal values of $w_{\text{feature}~i}$ that will give us the most accurate function for predicting a word's WPM ratio? This is where machine learning comes in.
 
 \section*{Machine Learning}
 
@@ -171,23 +173,74 @@ How do we find the optimal values of $w_{\text{feature} i}$ that will give us th
 
 The cost function will inform our machine learning algorithm how accurate its weights are, and more importantly, how to adjust its weights in order to reduce the cost.
 
-One popular cost function used in machine learning is the MSE (Mean Squared Error). This function defines the cost based on the squares of the difference between the actual data ($y_i$) and the predicted data ($f(x_i)$):
-
+One popular cost function used in machine learning is the MSE (Mean Squared Error). This function defines the cost as the squares of the difference between the actual data ($y_i$) and the predicted data ($f(x_i)$):
 \begin{align*}
-	C(x) & = \frac{1}{N}\big[(y_1 - f(x_1))^2 + (y_2 - f(x_2))^2 + ... + (y_n - f(x_n))^2]
+	C(f) & = \frac{1}{N}\big[(y_1 - f(x_1))^2 + (y_2 - f(x_2))^2 + ... + (y_n - f(x_n))^2]
 	\\
-	C(x) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(x_i))^2
+	C(f) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(x_i))^2
 \end{align*}
+
+To visualize this cost function, I've plotted the below data for a small set of words that have a clear correlation between word length and WPM Ratio:
+
+% \begin{noindent}
+\begin{pycode}
+def f3f(number):
+	return "%.3f" % number
+\end{pycode}
+% \end{noindent}
+
+\begin{tabularx}{\linewidth}{|X|X|X|}
+	Word            &
+	Word Length     &
+	WPM Ratio
+	\\\hline
+	``month.''      &
+	6               &
+	\py{f3f(1.8523997581589209)}
+	\\\hline
+	``should ''     &
+	7               &
+	\py{f3f(1.7302841332533008)}
+	\\\hline
+	``meaning.''    &
+	8               &
+	\py{f3f(1.614390135538142)}
+	\\\hline
+	``singing. ''   &
+	9               &
+	\py{f3f(1.5007211799003408)}
+	\\\hline
+	``thoughts. ''  &
+	10              &
+	\py{f3f(1.448833713008257)}
+	\\\hline
+	``standpoint '' &
+	11              &
+	\py{f3f(1.3051500032628751)}
+	\hline
+\end{tabularx}
 
 A visual example of this cost function would look like:
 
 \includegraphics{mse-cost.png}
 
-The goal of our machine learning algorithm is to minimize this function: to find a set of weights such that $C(x)$ is as low as possible. A popular method for minimizing cost is by using gradient descent.
+The goal of our machine learning algorithm is to minimize this function: to find a set of weights for our prediction function $f$ such that $C(f)$ is as low as possible. A popular method for minimizing cost is by using gradient descent.
 
 \subsection*{Gradient Descent}
 
-Gradient descent involves using the derivative of a function to find a function's local minimum.
+Gradient descent involves using the derivative of a function to find a function's local minimum. In our case, we need to find the local minimum of our cost function, $C$.
+
+Let's consider the case where our prediction function $f$ is correlated with only one weight, the text length.  For convenience, we'll denote "word $i$" as $x_i$, "text length of word $i$" as $l_i$, and "Bias" as $b$:
+\begin{align}
+	f(x_i) = w_1 * l_i + b
+\end{align}
+
+For this definition of $f$, our cost function would look like the following:
+\begin{align}
+	C(f) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(x_i))^2
+	\\
+	C(f) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1 * l_i - b)^2
+\end{align}
 
 \begin{itemize}
 	\item Whether the word is common (1 if the word is included within the top 1000 most common English words, and 0 otherwise).

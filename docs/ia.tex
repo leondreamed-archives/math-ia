@@ -7,7 +7,7 @@
 \usepackage{amsmath}
 \usepackage{ragged2e}
 
-\title{Using Machine Learning to Predict Typing Speed\vspace{-3em}}
+\title{Using Machine Learning to Predict Typing Speed}
 \author{jjr117}
 \date{}
 
@@ -223,25 +223,111 @@ def f3f(number):
 
 A visual example of this cost function would look like:
 
+% TODO
 \includegraphics{mse-cost.png}
 
 The goal of our machine learning algorithm is to minimize this function: to find a set of weights for our prediction function $f$ such that $C(f)$ is as low as possible. A popular method for minimizing cost is by using gradient descent.
 
 \subsection*{Gradient Descent}
 
-Gradient descent involves using the derivative of a function to find a function's local minimum. In our case, we need to find the local minimum of our cost function, $C$.
+Gradient descent involves using the derivative(s) of a function to find a function's local minimum. In our case, we need to find the local minimum of our cost function, $C$.
 
-Let's consider the case where our prediction function $f$ is correlated with only one weight, the text length.  For convenience, we'll denote "word $i$" as $x_i$, "text length of word $i$" as $l_i$, and "Bias" as $b$:
+Let's consider the case where our prediction function $f$ is linearly correlated with only one weight, the text length. For convenience, we'll denote "word $i$" as $W_i$, "text length of word $i$" as $x_i$:
 \begin{align}
-	f(x_i) = w_1 * l_i + b
+	f(W_i) = w_1x_i
 \end{align}
 
 For this definition of $f$, our cost function would look like the following:
 \begin{align}
-	C(f) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(x_i))^2
+	C(w_1) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(W_i))^2
 	\\
-	C(f) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1 * l_i - b)^2
+	C(w_1) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i)^2
 \end{align}
+
+% TODO
+\includegraphics{cost-function.png}
+
+For a certain $w_1$, the gradient on the graph is equal to its slope at that point ($w_1$, $C(w_1)$). The gradient tells us in which direction the graph is increasing. To minimize cost, we need to move in the direction opposite to this gradient (hence the term "gradient descent").
+
+To find the slope at a given $w_1$, we calculate the derivative of the cost function with respect to $w_1$:
+
+\begin{align*}
+	C(w_1)          & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i)^2
+	\\
+	\frac{dC}{dw_1} & = \frac{1}{N} \sum_{i=1}^{n} 2(y_i - w_1x_i) * -x_i
+	\\
+	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i) * x_i
+\end{align*}
+
+% \begin{noindent}
+\begin{pycode}
+x_values = [data[1] for data in word_data]
+y_values = [data[2] for data in word_data]
+weight = 2
+def get_expanded_summation():
+	global weight
+	equation = ""
+	for i, x, y in zip(range(len(x_values)), x_values, y_values):
+		if i % 4 == 3:
+			equation += "\\\\ &"
+		equation += f"\\big({'%.3f' % y} - ({weight})({x}) * ({x})\\big)"
+		if i != len(x_values) - 1:
+			equation += "+"
+	return equation
+
+def get_cost_derivative():
+	global weight
+	summation_sum = 0
+	for x, y in zip(x_values, y_values):
+		summation_sum += (y - weight * x) * x
+	return (-2 / len(x_values)) * summation_sum
+cost_derivative = get_cost_derivative()
+
+cost_derivative_str = "%.2f" % get_cost_derivative()
+\end{pycode}
+% \end{noindent}
+
+% TODO - reference previous graph
+For example, if $w_1$ is \py{weight}, then the gradient $\frac{dC}{dw_1}$ would equal:
+\begin{align*}
+	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i) * x_i
+	\\
+	\frac{dC}{dw_1} & =
+	\begin{aligned}[t]
+		-\frac{2}{\py{len(x_values)}}
+		\Big( & \py{get_expanded_summation()}\Big)
+	\end{aligned}
+	\\
+	\frac{dC}{dw_1} & = \py{cost_derivative_str}
+\end{align*}
+
+Since the gradient at $w_1$ is positive, it indicates that the the slope is positive. To decrease the loss, we need to decrease $w_1$ such that we are moving in the direction opposite to the direction where the gradient is increasing.
+
+However, how do we know how much to move by? If we move too far, we might move too far left, we could end up in a position of higher loss than we were before. If we move left too slowly, it will take a long time before we find the minimum.
+
+The parameter that determines how much we move is called the learning rate, $\eta$. To find the new weight, $w_1'$, we add the current weight $w_1$ to the learning rate times the negative gradient:
+\begin{align*}
+	w_1' & = w_1 + (-\frac{dC}{dw_1} * \eta)
+	\\
+	w_1' & = w_1 - \frac{dC}{dw_1} * \eta
+	\\
+	w_1' & = \py{weight} - \py{cost_derivative_str} * \eta
+\end{align*}
+
+% \begin{noindent}
+\begin{pycode}
+learning_rate = 0.001
+\end{pycode}
+% \end{noindent}
+
+If we give $\eta$ the value of 0.001, then our new value for $w_1$ is:
+\begin{align*}
+	w_1' & = \py{weight} - \py{cost_derivative_str} * \py{learning_rate}
+	\\
+	w_1' & = \py{weight} - \py{f3f(cost_derivative * learning_rate)}
+	\\
+	w_1' & = \py{f3f(weight - cost_derivative * learning_rate)}
+\end{align*}
 
 \begin{itemize}
 	\item Whether the word is common (1 if the word is included within the top 1000 most common English words, and 0 otherwise).

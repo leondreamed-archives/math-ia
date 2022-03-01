@@ -263,7 +263,7 @@ To find the slope at a given $w_1$, we calculate the derivative of the cost func
 \begin{pycode}
 x_values = [data[1] for data in word_data]
 y_values = [data[2] for data in word_data]
-weight = 2
+weight = 0.3
 def get_expanded_summation():
 	global weight
 	equation = ""
@@ -290,7 +290,7 @@ cost_derivative_str = "%.2f" % get_cost_derivative()
 % TODO - reference previous graph
 For example, if $w_1$ is \py{weight}, then the gradient $\frac{dC}{dw_1}$ would equal:
 \begin{align*}
-	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i) * x_i
+	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - (\py{weight})x_i) * x_i
 	\\
 	\frac{dC}{dw_1} & =
 	\begin{aligned}[t]
@@ -301,9 +301,9 @@ For example, if $w_1$ is \py{weight}, then the gradient $\frac{dC}{dw_1}$ would 
 	\frac{dC}{dw_1} & = \py{cost_derivative_str}
 \end{align*}
 
-Since the gradient at $w_1$ is positive, it indicates that the the slope is positive. To decrease the loss, we need to decrease $w_1$ such that we are moving in the direction opposite to the direction where the gradient is increasing.
+Since the gradient at $w_1 = \py{weight}$ is positive, it indicates that the the slope at the point ($w_1$) is positive. To decrease the loss, we need to increase $w_1$ so that we are moving in the direction opposite to the direction where the gradient is increasing.
 
-However, how do we know how much to move by? If we move too far, we might move too far left, we could end up in a position of higher loss than we were before. If we move left too slowly, it will take a long time before we find the minimum.
+However, how do we know how much to move by? If we move too far, we could end up in a position of higher loss than we were before. If we move left too slowly, it will take a long time before we find the minimum.
 
 The parameter that determines how much we move is called the learning rate, $\eta$. To find the new weight, $w_1'$, we add the current weight $w_1$ to the learning rate times the negative gradient:
 \begin{align*}

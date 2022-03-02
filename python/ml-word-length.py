@@ -128,5 +128,7 @@ def plot_line(weights):
 
 final_weights = train(weights, features_of_words, targets)
 
+print("final: ", final_weights)
+
 # plot_loss_function()
 plot_line(final_weights)

@@ -335,7 +335,7 @@ Each partial derivative with respect to a variable tells us how the cost functio
 	\frac{dC}{dw_1} & = \py{cost_derivative_str}
 \end{align*}
 
-Because the value of $\frac{dC}{dw_1}$ is positive, it indicates that increasing $w_1$ and keeping $b$ constant would increase the value of our cost function $C(w_1, b)$. However, in machine learning, because our goal is to minimize this cost, we should decrease $w_1$.
+Because the value of $\frac{dC}{dw_1}$ is positive, it indicates that increasing $w_1$ and keeping $b$ constant would increase the value of our cost function $C(w_1, b)$. This means that our current value of $w_1$ is greater than the optimal value of $w_1$, and to minimize our cost function, we need we should decrease $w_1$.
 
 % \begin{noindent}
 \begin{pycode}
@@ -365,7 +365,7 @@ cost_derivative_bias_str = "%.2f" % get_cost_derivative_bias()
 \end{pycode}
 % \end{noindent}
 
-This process is repeated for each partial derivative. For example, with our current bias value \py{bias}, the partial derivative $\frac{dC}{db}$ is equal to:
+This process is repeated for each partial derivative. For example, with our current bias value $b = \py{bias}$, the partial derivative $\frac{dC}{db}$ is equal to:
 \begin{align*}
 	\frac{dC}{db} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - (\py{weight})x_i - (\py{bias}))
 	\\
@@ -378,31 +378,70 @@ This process is repeated for each partial derivative. For example, with our curr
 	\frac{dC}{db} & = \py{cost_derivative_bias_str}
 \end{align*}
 
-In this case, since $\frac{dC}{db}$ is negative when $b = \py{bias}$, it indicates that increasing $b$ will decrease the cost.
+In this case, since $\frac{dC}{db}$ is negative when $b = \py{bias}$, it indicates that increasing $b$ will decrease the cost. This means that our current value of $b$ is below the optimal value of $b$, and that we should increase it to minimize the cost.
 
-The hyperparameter that determines how much we increase/decrease the weight by is called the learning rate, $\eta$. To find the new weight, $w_1'$, we add the current weight $w_1$ to the learning rate times the negative gradient:
-\begin{align*}
-	w_1' & = w_1 + (-\frac{dC}{dw_1} * \eta)
-	\\
-	w_1' & = w_1 - \frac{dC}{dw_1} * \eta
-	\\
-	w_1' & = \py{weight} - (\py{cost_derivative_str}) * \eta
-\end{align*}
+After we know for each variable whether we should increase it or decrease it, the hyperparameter that determines how much we increase/decrease each variable by is called the learning rate, $\eta$. To find the new weight, $w_1'$, we add the current weight $w_1$ to the learning rate times the negative gradient. We use the negative gradient so that when our gradient is positive, we decrease the variable to decrease our cost, and when our gradient is negative, we increase the variable to decrease our cost:
+{
+\setlength{\abovedisplayskip}{0pt}
+\setlength{\belowdisplayskip}{0pt}
+\begin{center}
+	\noindent\begin{tabularx}{0.8\linewidth}{X X}
+		\vbox{
+			\begin{align*}
+				w_1' & = w_1 + (-\frac{dC}{dw_1} * \eta)
+				\\
+				w_1' & = w_1 - \frac{dC}{dw_1} * \eta
+				\\
+				w_1' & = \py{weight} - (\py{cost_derivative_str}) * \eta
+			\end{align*}
+		}
+		 &
+		\vbox{
+			\begin{align*}
+				b' & = b + (-\frac{dC}{db} * \eta)
+				\\
+				b' & = b - \frac{dC}{db} * \eta
+				\\
+				b' & = \py{bias} - (\py{cost_derivative_bias_str}) * \eta
+			\end{align*}
+		}
+	\end{tabularx}
+\end{center}
+}
 
 % \begin{noindent}
 \begin{pycode}
-learning_rate = 0.001
+learning_rate = 0.01
 \end{pycode}
 % \end{noindent}
 
-If we give $\eta$ the value of 0.001, then our new value for $w_1$ is:
-\begin{align*}
-	w_1' & = \py{weight} - (\py{cost_derivative_str}) * \py{learning_rate}
-	\\
-	w_1' & = \py{weight} - (\py{f3f(cost_derivative * learning_rate)})
-	\\
-	w_1' & = \py{f3f(weight - cost_derivative * learning_rate)}
-\end{align*}
+{
+\setlength{\abovedisplayskip}{0pt}
+\setlength{\belowdisplayskip}{0pt}
+For example, if we set $\eta$ equal to \py{learning_rate}, then the new values for our weight and bias are:
+\begin{center}
+	\begin{tabularx}{0.8\linewidth}{X X}
+		\vbox{
+			\begin{align*}
+				w_1' & = \py{weight} - (\py{cost_derivative_str}) * \py{learning_rate}
+				\\
+				w_1' & = \py{weight} - (\py{f3f(cost_derivative * learning_rate)})
+				\\
+				w_1' & = \py{f3f(weight - cost_derivative * learning_rate)}
+			\end{align*}
+		} &
+		\vbox{
+			\begin{align*}
+				b' & = \py{bias} - (\py{cost_derivative_bias_str}) * \py{learning_rate}
+				\\
+				b' & = \py{bias} - (\py{f3f(cost_derivative_bias * learning_rate)})
+				\\
+				b' & = \py{f3f(bias - cost_derivative_bias * learning_rate)}
+			\end{align*}
+		}
+	\end{tabularx}
+\end{center}
+}
 
 However, how do we know what value of $\eta$ we should use? In other words, how much should increase or decrease $w_1$ by? If we increase/decrease the weight by too much, we could end up in a position of higher loss than we were before. If we move increase/decrease the weight too slowly, it will take a long time before we find the minimum:
 

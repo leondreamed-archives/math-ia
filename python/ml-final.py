@@ -64,23 +64,29 @@ def cost_derivative_bias(features_of_words, targets, weights):
 
 
 def update_weights(features_of_words, targets, weights, learning_rate):
-    weight_derivative = cost_derivative(features_of_words, targets, weights, 0)
+    num_features = len(features_of_words[0])
+
+    weight_derivatives = [
+        cost_derivative(features_of_words, targets, weights, feature_index)
+        for feature_index in range(num_features)
+    ]
+
     bias_derivative = cost_derivative_bias(features_of_words, targets, weights)
 
-    next_weight = weights[0] - weight_derivative * learning_rate
-    next_bias = weights[1] - bias_derivative * learning_rate
+    next_weights = []
+    for feature_index in range(num_features):
+        next_weights.append(weights[feature_index] - weight_derivatives[feature_index] * learning_rate)
 
-    return [next_weight, next_bias]
+    next_bias = weights[-1] - bias_derivative * learning_rate
 
+    return [*next_weights, next_bias]
 
 weights_history = []
-epochs = 100
-
 
 def train(weights, features, targets):
     global weights_history
 
-    epochs = 100000
+    epochs = 10
     learning_rate = 0.01
     for epoch in range(epochs):
         next_weights = update_weights(features, targets, weights, learning_rate)
@@ -94,8 +100,7 @@ def train(weights, features, targets):
     return weights
 
 
-word_stats = json.load(Path("data/word-stats.json").read_text())
-
+word_stats = json.loads(Path("data/word-stats.json").read_text())
 
 def parse_words(word_stats):
     """
@@ -176,11 +181,11 @@ def plot_loss_function():
 
 def plot_line(weights):
     print(weights)
+    num_words = len(features_of_words)
     predictions = predict(features_of_words, weights)
-    features = [features_of_word[0] for features_of_word in features_of_words]
 
-    plt.plot(features, predictions)
-    plt.scatter(features, targets)
+    plt.scatter(range(num_words), predictions, color='orange')
+    plt.scatter(range(num_words), targets, color='green')
     plt.show()
 
 

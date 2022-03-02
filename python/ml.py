@@ -34,22 +34,26 @@ def update_weights(features_of_words, targets, weights, learning_rate):
 	next_weights = []
 	for feature_index in range(len(features_of_words[0])):
 		derivative = cost_derivative(features_of_words, targets, weights, feature_index)
-		print("Derivative: ", derivative)
 		next_weight = weights[feature_index] - derivative * learning_rate
 		next_weights.append(next_weight)
-	print(next_weights)
 	return next_weights
 
+
+weights_history = []
+epochs = 100
+
 def train(weights, features, targets):
-	epochs = 1000
-	learning_rate = 0.0001
+	global weights_history
+
+	epochs = 100
+	learning_rate = 0.001
 	for epoch in range(epochs):
 		next_weights = update_weights(features, targets, weights, learning_rate)
 
 		cost = cost_function(features, targets, weights)
-		print(cost)
 
 		weights = next_weights
+		weights_history.append(next_weights)
 	return weights
 
 # Only one weight
@@ -82,6 +86,11 @@ weights = [x / 10000 for x in range(500, 3000)]
 cost_y = [cost_function(features_of_words, targets, [weight]) for weight in weights]
 cost_dy = [cost_derivative(features_of_words, targets, [weight], 0) for weight in weights]
 
+def plot_loss_function():
+	losses = [cost_function(features_of_words, targets, weights) for weights in weights_history]
+	plt.plot(range(len(losses)), losses)
+	plt.show()
+
 # plt.plot(weights, cost_y)
 # plt.plot(weights, cost_dy, color='red')
 
@@ -93,3 +102,5 @@ cost_dy = [cost_derivative(features_of_words, targets, [weight], 0) for weight i
 
 
 train(weights, features_of_words, targets)
+
+plot_loss_function()

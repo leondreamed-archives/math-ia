@@ -232,7 +232,7 @@ The goal of our machine learning algorithm is to minimize this function: to find
 
 Gradient descent involves using the derivative(s) of a function to find a function's local minimum. In our case, we need to find the local minimum of our cost function, $C$.
 
-Let's consider the case where our prediction function $f$ is linearly correlated with only one weight, the text length. For convenience, we'll denote "word $i$" as $W_i$, "text length of word $i$" as $x_i$:
+Let's consider the case where our prediction function $f$ is linearly correlated with only one weight, the text length. For convenience, we'll denote "word $i$" as $W_i$ and "text length of word $i$" as $x_i$:
 \begin{align}
 	f(W_i) = w_1x_i
 \end{align}
@@ -246,6 +246,10 @@ For this definition of $f$, our cost function would look like the following:
 
 % TODO
 \includegraphics{cost-function.png}
+
+The goal of our machine learning algorithm is to minimize this cost function. In other words, our goal is to find a global minimum on the graph of $C(w_1)$.
+
+To find a minimum, we need to use the derivative of $C(w_1)$ and identify points where the derivative is equal to 0, which would indicate either
 
 For a certain $w_1$, the gradient on the graph is equal to its slope at that point ($w_1$, $C(w_1)$). The gradient tells us in which direction the graph is increasing. To minimize cost, we need to move in the direction opposite to this gradient (hence the term "gradient descent").
 
@@ -301,11 +305,31 @@ For example, if $w_1$ is \py{weight}, then the gradient $\frac{dC}{dw_1}$ would 
 	\frac{dC}{dw_1} & = \py{cost_derivative_str}
 \end{align*}
 
-Since the gradient at $w_1 = \py{weight}$ is positive, it indicates that the the slope at the point ($w_1$) is positive. To decrease the loss, we need to increase $w_1$ so that we are moving in the direction opposite to the direction where the gradient is increasing.
+Since the gradient at $w_1 = \py{weight}$ is positive, it indicates that the the slope at the point ($w_1$) is positive and that increasing $w_1$ would increase the cost. Thus, to decrease the loss, we need to move in the direction, and so we decrease $w_1$ to decrease the loss.
 
-However, how do we know how much to move by? If we move too far, we could end up in a position of higher loss than we were before. If we move left too slowly, it will take a long time before we find the minimum.
+% \begin{noindent}
+\begin{pycode}
+weight = 0.1
+cost_derivative_str = "%.2f" % get_cost_derivative()
+\end{pycode}
+% \end{noindent}
 
-The parameter that determines how much we move is called the learning rate, $\eta$. To find the new weight, $w_1'$, we add the current weight $w_1$ to the learning rate times the negative gradient:
+When the weight is too small, for example, \py{weight}, then the gradient at $w_1$ will be negative:
+\begin{align*}
+	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - (\py{weight})x_i) * x_i
+	\\
+	\frac{dC}{dw_1} & =
+	\begin{aligned}[t]
+		-\frac{2}{\py{len(x_values)}}
+		\Big( & \py{get_expanded_summation()}\Big)
+	\end{aligned}
+	\\
+	\frac{dC}{dw_1} & = \py{cost_derivative_str}
+\end{align*}
+
+In this case, a negative gradient at $w_1 = \py{weight}$ indicates that increasing $w_1$ will decrease the cost.
+
+The hyperparameter that determines how much we increase/decrease the weight by is called the learning rate, $\eta$. To find the new weight, $w_1'$, we add the current weight $w_1$ to the learning rate times the negative gradient:
 \begin{align*}
 	w_1' & = w_1 + (-\frac{dC}{dw_1} * \eta)
 	\\
@@ -328,6 +352,16 @@ If we give $\eta$ the value of 0.001, then our new value for $w_1$ is:
 	\\
 	w_1' & = \py{f3f(weight - cost_derivative * learning_rate)}
 \end{align*}
+
+However, how do we know what value of $\eta$ we should use? In other words, how much should increase or decrease $w_1$ by? If we increase/decrease the weight by too much, we could end up in a position of higher loss than we were before. If we move increase/decrease the weight too slowly, it will take a long time before we find the minimum:
+
+% TODO
+\begin{figure}[hbt!]
+	\caption{Increasing by too much would overshoot the local minimum; increasing by too little would take too long to reach the local minimum.}
+	\includegraphics{}
+\end{figure}
+
+The optimal choice of $\eta$ will vary for different problems, but there are heuristics that can help.
 
 \begin{itemize}
 	\item Whether the word is common (1 if the word is included within the top 1000 most common English words, and 0 otherwise).
@@ -428,7 +462,6 @@ def get_table_2_row(w):
 		\\\hline
 	\end{tabularx}
 \end{table}
-
 
 \begin{figure}[hbt!]
 	\caption{The Programmer Dvorak Keyboard Layout}

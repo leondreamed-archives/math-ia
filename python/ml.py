@@ -3,9 +3,11 @@ import matplotlib.pyplot as plt
 def predict(features_of_words, weights):
 	predictions = []
 	for word_features in features_of_words:
-		prediction = 0
-		for feature, weight in zip(word_features, weights):
-			prediction += feature * weight
+		w_1 = weights[0]
+		b = weights[1]
+
+		prediction = w_1 * word_features[0] + b
+
 		predictions.append(prediction)
 	return predictions
 
@@ -23,20 +25,37 @@ def cost_function(features_of_words, targets, weights):
 def cost_derivative(features_of_words, targets, weights, feature_index):
 	N = len(features_of_words)
 	sum = 0
+
 	predictions = predict(features_of_words, weights)
+
 	# Iterating through all words
 	for prediction, target, word_features in zip(predictions, targets, features_of_words):
 		# For each word, find the inner value of the summation
 		sum += (target - prediction) * word_features[feature_index]
+
+	return -2.0/N * sum
+
+def cost_derivative_bias(features_of_words, targets, weights):
+	N = len(features_of_words)
+	sum = 0
+
+	predictions = predict(features_of_words, weights)
+
+	# Iterating through all words
+	for prediction, target in zip(predictions, targets):
+		# For each word, find the inner value of the summation
+		sum += (target - prediction)
+
 	return -2.0/N * sum
 
 def update_weights(features_of_words, targets, weights, learning_rate):
-	next_weights = []
-	for feature_index in range(len(features_of_words[0])):
-		derivative = cost_derivative(features_of_words, targets, weights, feature_index)
-		next_weight = weights[feature_index] - derivative * learning_rate
-		next_weights.append(next_weight)
-	return next_weights
+	weight_derivative = cost_derivative(features_of_words, targets, weights, 0)
+	bias_derivative = cost_derivative_bias(features_of_words, targets, weights)
+
+	next_weight = weights[0] - weight_derivative * learning_rate
+	next_bias = weights[1] - bias_derivative * learning_rate
+
+	return [next_weight, next_bias]
 
 
 weights_history = []
@@ -45,19 +64,21 @@ epochs = 100
 def train(weights, features, targets):
 	global weights_history
 
-	epochs = 100
-	learning_rate = 0.001
+	epochs = 100000
+	learning_rate = 0.01
 	for epoch in range(epochs):
 		next_weights = update_weights(features, targets, weights, learning_rate)
 
 		cost = cost_function(features, targets, weights)
 
 		weights = next_weights
+		print(weights)
+
 		weights_history.append(next_weights)
 	return weights
 
-# Only one weight
-weights = [0]
+# Two weights, $w_1$ and $b$
+weights = [0, 0]
 features_of_words = [
 	[6], # word 1 has 6 chars
 	[7], # word 2 has 7 chars
@@ -82,10 +103,6 @@ targets = [
 	1.3051500032628751
 ]
 
-weights = [x / 10000 for x in range(500, 3000)]
-cost_y = [cost_function(features_of_words, targets, [weight]) for weight in weights]
-cost_dy = [cost_derivative(features_of_words, targets, [weight], 0) for weight in weights]
-
 def plot_loss_function():
 	losses = [cost_function(features_of_words, targets, weights) for weights in weights_history]
 	plt.plot(range(len(losses)), losses)
@@ -100,7 +117,16 @@ def plot_loss_function():
 
 # plt.show()
 
+def plot_line(weights):
+	print(weights)
+	predictions = predict(features_of_words, weights)
+	features = [features_of_word[0] for features_of_word in features_of_words]
 
-train(weights, features_of_words, targets)
+	plt.plot(features, predictions)
+	plt.scatter(features, targets)
+	plt.show()
 
-plot_loss_function()
+final_weights = train(weights, features_of_words, targets)
+
+# plot_loss_function()
+plot_line(final_weights)

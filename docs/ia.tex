@@ -234,67 +234,97 @@ Gradient descent involves using the derivative(s) of a function to find a functi
 
 Let's consider the case where our prediction function $f$ is linearly correlated with only one weight, the text length. For convenience, we'll denote "word $i$" as $W_i$ and "text length of word $i$" as $x_i$:
 \begin{align}
-	f(W_i) = w_1x_i
+	f(W_i) = w_1x_i + b
 \end{align}
+
+The bias term $b$ is necessary because otherwise our machine learning algorithm would be forced to predict a line that passes through the origin, which wouldn't correlate with our data.
 
 For this definition of $f$, our cost function would look like the following:
 \begin{align}
-	C(w_1) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(W_i))^2
+	C(w_1, b) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(W_i))^2
 	\\
-	C(w_1) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i)^2
+	C(w_1, b) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)^2
 \end{align}
 
 % TODO
 \includegraphics{cost-function.png}
 
-The goal of our machine learning algorithm is to minimize this cost function. In other words, our goal is to find a global minimum on the graph of $C(w_1)$.
+The goal of our machine learning algorithm is to minimize this cost function. In other words, our goal is to find a global minimum on the graph of $C(w_1, b)$.
 
-To find a minimum, we need to use the derivative of $C(w_1)$ and identify points where the derivative is equal to 0, which would indicate either
+To find a minimum, we need to use the derivatives of $C(w_1, b)$. But, our cost function has more than one variable, $w_1$ and $b$. In this scenario, we need to use partial derivatives.
 
-For a certain $w_1$, the gradient on the graph is equal to its slope at that point ($w_1$, $C(w_1)$). The gradient tells us in which direction the graph is increasing. To minimize cost, we need to move in the direction opposite to this gradient (hence the term "gradient descent").
+\subsection*{Partial Derivatives}
 
-To find the slope at a given $w_1$, we calculate the derivative of the cost function with respect to $w_1$:
-
+For a function that takes multiple variables, the gradient of the function is a vector, where the  containing separate derivatives with respect to each variable. For our cost function, this means that the gradient, $\nabla Q$, is equal to:
 \begin{align*}
-	C(w_1)          & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i)^2
-	\\
-	\frac{dC}{dw_1} & = \frac{1}{N} \sum_{i=1}^{n} 2(y_i - w_1x_i) * -x_i
-	\\
-	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i) * x_i
+	\nabla Q = \Big(\frac{dC}{dw_1}, \frac{dC}{db}\Big)
 \end{align*}
+
+When calculating each partial derivative, the other input variables for the function are treated as constants. For example, when calculating $\frac{dC}{dw_1}$, the bias term $b$ is treated as a constant:
+\begin{align*}
+	C(w_1, b)       & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)^2
+	\\
+	\frac{dC}{dw_1} & = \frac{1}{N} \sum_{i=1}^{n} 2(y_i - w_1x_i - b) * -x_i
+	\\
+	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b) * x_i
+\end{align*}
+
+Likewise, when calculating $\frac{dC}{db}$, the weight $w_1$ is treated as a constant:
+\begin{align*}
+	C(w_1)        & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)^2
+	\\
+	\frac{dC}{db} & = \frac{1}{N} \sum_{i=1}^{n} 2(y_i - w_1x_i - b) * -1
+	\\
+	\frac{dC}{db} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)
+\end{align*}
+
+Thus, the gradient $\nabla Q$ of our cost function is equal to:
+\begin{align*}
+	\nabla Q = \Big(
+	 &
+	-\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b) * x_i,
+	\\
+	 & -\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)
+	\Big)
+\end{align*}
+
+% Partial Derivative Example Calculation
 
 % \begin{noindent}
 \begin{pycode}
 x_values = [data[1] for data in word_data]
 y_values = [data[2] for data in word_data]
+bias = -1
 weight = 0.3
 def get_expanded_summation():
 	global weight
+	global bias
 	equation = ""
 	for i, x, y in zip(range(len(x_values)), x_values, y_values):
-		if i % 4 == 3:
+		if i != 0 and i % 2 == 0:
 			equation += "\\\\ &"
-		equation += f"\\big({'%.3f' % y} - ({weight})({x}) * ({x})\\big)"
+		equation += f"\\big[\\big({'%.3f' % y} - ({weight})({x}) - ({bias})\\big) * ({x})\\big]"
 		if i != len(x_values) - 1:
 			equation += "+"
 	return equation
 
 def get_cost_derivative():
 	global weight
+	global bias
 	summation_sum = 0
 	for x, y in zip(x_values, y_values):
-		summation_sum += (y - weight * x) * x
+		summation_sum += (y - weight * x - bias) * x
 	return (-2 / len(x_values)) * summation_sum
+
 cost_derivative = get_cost_derivative()
 
 cost_derivative_str = "%.2f" % get_cost_derivative()
 \end{pycode}
 % \end{noindent}
 
-% TODO - reference previous graph
-For example, if $w_1$ is \py{weight}, then the gradient $\frac{dC}{dw_1}$ would equal:
+Each partial derivative with respect to a variable tells us how the cost function would change if the variable changed. For example, if $w_1 = \py{weight}$, the partial derivative $\frac{dC}{dw_1}$ is equal to:
 \begin{align*}
-	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - (\py{weight})x_i) * x_i
+	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - (\py{weight})x_i - (\py{bias})) * x_i
 	\\
 	\frac{dC}{dw_1} & =
 	\begin{aligned}[t]
@@ -305,30 +335,50 @@ For example, if $w_1$ is \py{weight}, then the gradient $\frac{dC}{dw_1}$ would 
 	\frac{dC}{dw_1} & = \py{cost_derivative_str}
 \end{align*}
 
-Since the gradient at $w_1 = \py{weight}$ is positive, it indicates that the the slope at the point ($w_1$) is positive and that increasing $w_1$ would increase the cost. Thus, to decrease the loss, we need to move in the direction, and so we decrease $w_1$ to decrease the loss.
+Because the value of $\frac{dC}{dw_1}$ is positive, it indicates that increasing $w_1$ and keeping $b$ constant would increase the value of our cost function $C(w_1, b)$. However, in machine learning, because our goal is to minimize this cost, we should decrease $w_1$.
 
 % \begin{noindent}
 \begin{pycode}
-weight = 0.1
-cost_derivative = get_cost_derivative()
-cost_derivative_str = "%.2f" % get_cost_derivative()
+def get_expanded_summation_bias():
+	global weight
+	global bias
+	equation = ""
+	for i, x, y in zip(range(len(x_values)), x_values, y_values):
+		if i != 0 and i % 2 == 0:
+			equation += "\\\\ &"
+		equation += f"\\big[\\big({'%.3f' % y} - ({weight})({x}) - ({bias})\\big)\\big]"
+		if i != len(x_values) - 1:
+			equation += "+"
+	return equation
+
+def get_cost_derivative_bias():
+	global weight
+	global bias
+	summation_sum = 0
+	for x, y in zip(x_values, y_values):
+		summation_sum += (y - weight * x - bias)
+	return (-2 / len(x_values)) * summation_sum
+
+cost_derivative_bias = get_cost_derivative_bias()
+
+cost_derivative_bias_str = "%.2f" % get_cost_derivative_bias()
 \end{pycode}
 % \end{noindent}
 
-When the weight is too small, for example, \py{weight}, then the gradient at $w_1$ will be negative:
+This process is repeated for each partial derivative. For example, with our current bias value \py{bias}, the partial derivative $\frac{dC}{db}$ is equal to:
 \begin{align*}
-	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - (\py{weight})x_i) * x_i
+	\frac{dC}{db} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - (\py{weight})x_i - (\py{bias}))
 	\\
-	\frac{dC}{dw_1} & =
+	\frac{dC}{db} & =
 	\begin{aligned}[t]
 		-\frac{2}{\py{len(x_values)}}
-		\Big( & \py{get_expanded_summation()}\Big)
+		\Big( & \py{get_expanded_summation_bias()}\Big)
 	\end{aligned}
 	\\
-	\frac{dC}{dw_1} & = \py{cost_derivative_str}
+	\frac{dC}{db} & = \py{cost_derivative_bias_str}
 \end{align*}
 
-In this case, a negative gradient at $w_1 = \py{weight}$ indicates that increasing $w_1$ will decrease the cost.
+In this case, since $\frac{dC}{db}$ is negative when $b = \py{bias}$, it indicates that increasing $b$ will decrease the cost.
 
 The hyperparameter that determines how much we increase/decrease the weight by is called the learning rate, $\eta$. To find the new weight, $w_1'$, we add the current weight $w_1$ to the learning rate times the negative gradient:
 \begin{align*}

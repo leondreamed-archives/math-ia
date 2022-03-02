@@ -310,6 +310,7 @@ Since the gradient at $w_1 = \py{weight}$ is positive, it indicates that the the
 % \begin{noindent}
 \begin{pycode}
 weight = 0.1
+cost_derivative = get_cost_derivative()
 cost_derivative_str = "%.2f" % get_cost_derivative()
 \end{pycode}
 % \end{noindent}
@@ -335,7 +336,7 @@ The hyperparameter that determines how much we increase/decrease the weight by i
 	\\
 	w_1' & = w_1 - \frac{dC}{dw_1} * \eta
 	\\
-	w_1' & = \py{weight} - \py{cost_derivative_str} * \eta
+	w_1' & = \py{weight} - (\py{cost_derivative_str}) * \eta
 \end{align*}
 
 % \begin{noindent}
@@ -346,9 +347,9 @@ learning_rate = 0.001
 
 If we give $\eta$ the value of 0.001, then our new value for $w_1$ is:
 \begin{align*}
-	w_1' & = \py{weight} - \py{cost_derivative_str} * \py{learning_rate}
+	w_1' & = \py{weight} - (\py{cost_derivative_str}) * \py{learning_rate}
 	\\
-	w_1' & = \py{weight} - \py{f3f(cost_derivative * learning_rate)}
+	w_1' & = \py{weight} - (\py{f3f(cost_derivative * learning_rate)})
 	\\
 	w_1' & = \py{f3f(weight - cost_derivative * learning_rate)}
 \end{align*}

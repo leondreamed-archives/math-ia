@@ -712,6 +712,63 @@ With vectors, updating the weights now becomes a simple one-liner:
 
 Not only do vectors allow us to represent our equations more succinctly, but they also make implementing them in code much easier.
 
+\section*{Results}
+
+% \begin{noindent}
+\begin{pycode}
+final_weights = [
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+]
+\end{pycode}
+% \end{noindent}
+
+Using the above vector equations, I've implemented a Python program that processes the features of all 20454 words and uses their actual WPM ratio to find the optimal set of weights that minimizes the cost function $C(\vec{W})$. I used a learning rate of 0.008 and trained my model over 100000 iterations, which took around 12 hours on my computer. After the program finished executing, it produced the following weights:
+\begin{align*}
+	w_{\text{\# of characters}}
+	 & = \py{final_weights[0]}
+	\\
+	w_{\text{\# of capitals}}
+	 & = \py{final_weights[1]}
+	\\
+	w_{\text{\# of same-finger consecutive letters}}
+	 & = \py{final_weights[2]}
+	\\
+	w_{\text{\# of double letters}}
+	 & = \py{final_weights[3]}
+	\\
+	w_{\text{\# of home row letters}}
+	 & = \py{final_weights[4]}
+	\\
+	w_{\text{\# of left hand letters}}
+	 & = \py{final_weights[5]}
+	\\
+	w_{\text{\# of right hand letters}}
+	 & = \py{final_weights[6]}
+	\\
+	w_{\text{\# of numbers}}
+	 & = \py{final_weights[7]}
+	\\
+	w_{\text{\# of letters requiring shift}}
+	 & = \py{final_weights[8]}
+	\\
+	w_{\text{is word common}}
+	 & =\py{final_weights[9]}
+	\\
+	b
+	 & = \py{final_weights[10]}
+\end{align*}
+
+
 \section*{Appendix}
 
 \begin{figure}[H]

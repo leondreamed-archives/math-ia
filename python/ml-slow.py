@@ -9,14 +9,8 @@ def predict(features_of_words, weights):
     for word_features in features_of_words:
         prediction = 0
 
-        # weights[0] * word_features[0] +
-        # weights[1] * word_features[1] +
-        # weights[2] * word_features[2] + ...
         for word_feature, weight in zip(weights, word_features):
             prediction += weight * word_feature
-
-        # Add the bias term
-        prediction += weights[-1]
 
         predictions.append(prediction)
     return predictions
@@ -73,17 +67,13 @@ def update_weights(features_of_words, targets, weights, learning_rate):
         for feature_index in range(num_features)
     ]
 
-    bias_derivative = cost_derivative_bias(features_of_words, targets, weights)
-
     next_weights = []
     for feature_index in range(num_features):
         next_weights.append(
             weights[feature_index] - weight_derivatives[feature_index] * learning_rate
         )
 
-    next_bias = weights[-1] - bias_derivative * learning_rate
-
-    return [*next_weights, next_bias]
+    return next_weights
 
 
 weights_history = []
@@ -92,7 +82,7 @@ weights_history = []
 def train(weights, features, targets):
     global weights_history
 
-    epochs = 1000
+    epochs = 10
     learning_rate = 0.008
     for epoch in range(epochs):
         next_weights = update_weights(features, targets, weights, learning_rate)
@@ -161,13 +151,13 @@ def parse_words(word_stats):
             num_right_hand_letters,
             num_shifted_letters,
             word_length,
+            1,
         ]
         num_features = len(features_of_word)
 
         features_of_words.append(features_of_word)
 
-    # +1 because we also need the bias term
-    weights = [0 for feature in range(num_features + 1)]
+    weights = [0 for feature in range(num_features)]
 
     return targets, features_of_words, weights
 

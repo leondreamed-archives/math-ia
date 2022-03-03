@@ -182,7 +182,7 @@ The cost function will give us a way to measure how accurate our prediction func
 
 One popular cost function used in machine learning is the MSE (Mean Squared Error). This function defines the cost as the squares of the difference between the actual data ($y_i$) and the predicted data ($f(\text{Word}_i)$):
 \begin{align*}
-	C(f) & = \frac{1}{N}\big[(y_1 - f(W_1))^2 + (y_2 - f(W_2))^2 + \dots + (y_n - f(W_n))^2]
+	C(f) & = \frac{1}{N}\big[(y_1 - f(\text{Word}_1))^2 + (y_2 - f(\text{Word}_2))^2 + \dots + (y_n - f(\text{Word}_n))^2]
 	\\
 	C(f) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(\text{Word}_i))^2
 \end{align*}
@@ -474,10 +474,10 @@ I created a Python program to run the above calculations for the values in Table
 	b = 2.472476099
 \end{align}
 
-If we substitute these values for $w_1$ and $b$ into our prediction function $f(\text{Word}_i)$ and plot our function on a graph alongside the data from Table 2, we obtain the following graph:
+If we substitute these values for $w_1$ and $b$ into our prediction function $f$ and plot our function on a graph alongside the data from Table 2, we obtain the following graph:
 \begin{figure}[H]
 	\centering
-	\caption{A graph of our prediction function $f(\text{Word}_i)$ using the values from equation 1}
+	\caption{A graph of our prediction function $f$ using the values from equation 1}
 	% TODO: plot the function in Excel
 	\includegraphics{}
 \end{figure}
@@ -620,7 +620,7 @@ The new gradient $\nabla Q$ for our cost function would now be:
 		\\
 		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{10}{x_{10}}_i - b) \times {x_2}_i,
 		\\
-		& \vdots
+		 & \vdots
 		\\
 		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{10}{x_{10}}_i - b) \times {x_{10}}_i,
 		\\
@@ -639,18 +639,77 @@ After each iteration, we need to update all 10 weights:
 	\;
 	w_{10}' = w_{10} - \frac{dC}{dw_{10}} \times \eta
 	\\
-	b' & = b - \frac{dC}{db} \times \eta
+	b'   & = b - \frac{dC}{db} \times \eta
 \end{align*}
 
-We can simplify the above equations and the implementation of the machine learning algorithm using matrices.
+We can simplify the above equations and the implementation of the machine learning algorithm using vectors.
 
-Let us denote $X_i$ as a 1 \times~N matrix containing all the values of the features of a word $\text{Word}_i$. Let us denote $W$ as a 1 \times~N matrix containing all the weights. Using these matrix definitions, we can rewrite our prediction function as:
+Let us denote $\vec{X_i}$ as a vector of length $(\text{\# features}) + 1$ containing all the values of the features of $\text{Word}_i$. Let us denote $\vec{W}$ as a vector containing all the weights, including the value of the bias at the end. Using these vector definitions, we can simplify our prediction function:
 \begin{align*}
-f(W_i) & = \Big(\sum_{f=1}^{10} w_f{x_f}_i\Big) + b
-\\
-f(X) & = X \cdot W + b
+	f(\text{Word}_i) & = \Big(\sum_{f=1}^{10} w_f{x_f}_i\Big) + b
+	\\
+	f(\vec{X_i})     & = \vec{X_i} \cdot \vec{W} + b
 \end{align*}
 
+To further simplify this equation, we can define $\vec{X}_i$ as a vector of length $(\text{\# features}) + 1$ instead, where in addition to containing all the values of the features of $\text{Word}_i$, it also includes a constant 1 at the end:
+\begin{align*}
+	\vec{X}_i = ({x_1}_i, {x_2}_i, \dots, {x_{10}}_i, 1)
+\end{align*}
+
+This way, if we redefined $\vec{W}$ to contain all the weights \textit{and} the bias term:
+\begin{align*}
+	\vec{W} = (w_1, w_2, \dots, w_{10}, b)
+\end{align*}
+
+Our prediction function could then be written as:
+\begin{align*}
+	f(\vec{X}_i) = \vec{X_i} \cdot \vec{W}
+\end{align*}
+
+Since this would be equal to:
+\begin{align*}
+	f(\vec{X}_i) & = w_1{x_i}_1 + w_2{x_i}_2 + \dots + w_{10}{x_i}_{10} + (1)(b)
+	\\
+	f(\vec{X}_i) & = \Big(\sum_{f=1}^{10} w_f{x_f}_i\Big) + b
+\end{align*}
+
+Which is equal to our initial prediction function.
+
+\bigskip
+
+Using vectors, we can also simplify our cost function:
+\begin{align*}
+	C(f)          & = \frac{1}{10} \sum_{i=1}^{10} (y_i - f(\text{Word}_i))^2
+	\\
+	C(\vec{W}) & = \frac{1}{10} \sum_{i=1}^{10} (y_i - \vec{W} \cdot \vec{X_i})^2
+\end{align*}
+
+And finally, we can simplify our gradient $\nabla Q$:
+\begin{align*}
+	\nabla Q & = \Big(\frac{dC}{dw_1}, \frac{dC}{dw_2}, \dots, \frac{dC}{dw_{10}}, \frac{dC}{db}\Big)
+	\\
+	\nabla Q & =
+	\begin{aligned}[t]
+		\Big(
+		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - \vec{W} \cdot \vec{X_i}) \times {x_i}_1,
+		\\
+		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - \vec{W} \cdot \vec{X_i}) \times {x_i}_2,
+		\\
+		 & \vdots
+		\\
+		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - \vec{W} \cdot \vec{X_i}) \times {x_i}_{10},
+		\\
+		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - \vec{W} \cdot \vec{X_i})
+		\Big)
+	\end{aligned}
+\end{align*}
+
+With vectors, updating the weights now becomes a simple one-liner:
+\begin{align*}
+	\vec{W}' = W - \nabla Q \times \eta
+\end{align*}
+
+Not only do vectors allow us to represent our equations more succinctly, but they also make implementing them with code much easier.
 
 \section*{Appendix}
 

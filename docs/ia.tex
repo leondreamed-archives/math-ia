@@ -93,7 +93,7 @@ The WPM Ratio of a word depends on various features of the word, such as the len
 
 For example, if the typing speed of a word was linearly proportional to its length, then our predictive function might look like the following:
 \begin{align*}
-	\text{WPM Ratio} = w_{\text{word length}} * (\text{word length}) + \text{Bias}
+	\text{WPM Ratio} = w_{\text{word length}} \times (\text{word length}) + \text{Bias}
 \end{align*}
 
 This equation resembles the typical linear equation $y = mx + b$, where $w_{\text{word length}}$ represents the slope, or in other words, the amount that the WPM Ratio increases or decreases by when the word length is increased by 1.
@@ -157,21 +157,21 @@ Our function must take into account various features of the word that would affe
 
 To account for the different influences of different features, we need to assign a different weight to each of them in our equation, which gives us an equation similar to the following:
 \begin{align*}
-	\text{WPM Ratio} = w_1 * (\text{Feature 1}) + w_2 * (\text{Feature 2}) + ... + \text{Bias}
+	\text{WPM Ratio} = w_1 \times (\text{Feature 1}) + w_2 \times (\text{Feature 2}) + \dots + \text{Bias}
 \end{align*}
 
 For example, if the only two features that influence the difficulty of a are the length of the word and the number of capital letters in the word, then the equation would become:
 \begin{align*}
-	\text{WPM Ratio} = w_{\text{word length}} * (\text{word length}) + w_{\text{capital letters}} * (\text{\# of capital letters}) + \text{Bias}
+	\text{WPM Ratio} = w_{\text{word length}} \times (\text{word length}) + w_{\text{capital letters}} \times (\text{\# of capital letters}) + \text{Bias}
 \end{align*}
 
 In this equation, $w_{\text{word length}}$ isn't necessarily the same as $w_{\text{capital letters}}$. For example, if the magnitude of $w_{\text{word length}}$ is greater than $w_{\text{capital letters}}$, it means that the length of a word has more influence on the WPM ratio compared to the number of capital letters in the word.
 
-Let us define the WPM Ratio as a function that takes in a word $W_i$ as input and returns the sum of the feature weights multiplied with the feature values of $W_i$. If $w_i$ represents the weight for feature $i$, $x_{f_i}$ represents the feature value for feature $f$ of word $i$, and $b$ represents the bias term, then our WPM ratio equation can be written as:
+Let us define the WPM Ratio as a function that takes in a word $\text{Word}_i$ as input and returns the sum of the feature weights multiplied with the feature values of $\text{Word}_i$. If $w_i$ represents the weight for feature $i$, $x_{f_i}$ represents the feature value for feature $f$ of word $i$, and $b$ represents the bias term, then our WPM ratio equation can be written as:
 \begin{align*}
-	f(W_i) & = w_1{x_1}_i + w_2{x_2}_i + ... + w_n{x_n}_i + b
+	f(\text{Word}_i) & = w_1{x_1}_i + w_2{x_2}_i + \dots + w_n{x_n}_i + b
 	\\
-	f(W_i) & = \Big(\sum_{f=1}^{n} w_f{x_f}_i\Big) + b
+	f(\text{Word}_i) & = \Big(\sum_{f=1}^{n} w_f{x_f}_i\Big) + b
 \end{align*}
 
 In this equation, $f$ is our prediction function: given a word, it predicts the WPM ratio of the word based on its features. To create an accurate prediction function, we need to find optimal values of $w_f$ that will give us predicted WPM ratios that are as close as possible to actual WPM ratios from our data. To find optimal values of $w_f$, we need to use a cost function.
@@ -180,11 +180,11 @@ In this equation, $f$ is our prediction function: given a word, it predicts the 
 
 The cost function will give us a way to measure how accurate our prediction function $f$ is, and more importantly, how we can adjust the weights $w_i$ in our prediction function in order to reduce the cost.
 
-One popular cost function used in machine learning is the MSE (Mean Squared Error). This function defines the cost as the squares of the difference between the actual data ($y_i$) and the predicted data ($f(W_i)$):
+One popular cost function used in machine learning is the MSE (Mean Squared Error). This function defines the cost as the squares of the difference between the actual data ($y_i$) and the predicted data ($f(\text{Word}_i)$):
 \begin{align*}
-	C(f) & = \frac{1}{N}\big[(y_1 - f(W_1))^2 + (y_2 - f(W_2))^2 + ... + (y_n - f(W_n))^2]
+	C(f) & = \frac{1}{N}\big[(y_1 - f(W_1))^2 + (y_2 - f(W_2))^2 + \dots + (y_n - f(W_n))^2]
 	\\
-	C(f) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(W_i))^2
+	C(f) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(\text{Word}_i))^2
 \end{align*}
 
 To visualize this cost function, I've plotted the below data for a small set of words that have a clear correlation between word length and WPM Ratio:
@@ -248,12 +248,12 @@ Gradient descent involves using the derivative(s) of a function to find a functi
 
 Let's consider the case where our prediction function $f$ is linearly correlated with only one weight, the text length. If we let $x_i$ represent the "text length of word $i$", our prediction function would look like the following:
 \begin{align*}
-	f(W_i) = w_1x_i + b
+	f(\text{Word}_i) = w_1x_i + b
 \end{align*}
 
 For this definition of $f$, our cost function would look like the following:
 \begin{align*}
-	C(w_1, b) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(W_i))^2
+	C(w_1, b) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(\text{Word}_i))^2
 	\\
 	C(w_1, b) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)^2
 \end{align*}
@@ -278,16 +278,16 @@ When calculating each partial derivative, the other input variables for the func
 \begin{align*}
 	C(w_1, b)       & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)^2
 	\\
-	\frac{dC}{dw_1} & = \frac{1}{N} \sum_{i=1}^{n} 2(y_i - w_1x_i - b) * -x_i
+	\frac{dC}{dw_1} & = \frac{1}{N} \sum_{i=1}^{n} 2(y_i - w_1x_i - b) \times -x_i
 	\\
-	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b) * x_i
+	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b) \times x_i
 \end{align*}
 
 Likewise, when calculating $\frac{dC}{db}$, the weight $w_1$ is treated as a constant:
 \begin{align*}
-	C(w_1, b)        & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)^2
+	C(w_1, b)     & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)^2
 	\\
-	\frac{dC}{db} & = \frac{1}{N} \sum_{i=1}^{n} 2(y_i - w_1x_i - b) * -1
+	\frac{dC}{db} & = \frac{1}{N} \sum_{i=1}^{n} 2(y_i - w_1x_i - b) \times -1
 	\\
 	\frac{dC}{db} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)
 \end{align*}
@@ -296,7 +296,7 @@ Thus, the gradient $\nabla Q$ of our cost function is equal to:
 \begin{align*}
 	\nabla Q = \Big(
 	 &
-	-\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b) * x_i,
+	-\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b) \times x_i,
 	\\
 	 & -\frac{2}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)
 	\Big)
@@ -317,7 +317,7 @@ def get_expanded_summation():
 	for i, x, y in zip(range(len(x_values)), x_values, y_values):
 		if i != 0 and i % 2 == 0:
 			equation += "\\\\ &"
-		equation += f"\\big[\\big({'%.3f' % y} - ({weight})({x}) - ({bias})\\big) * ({x})\\big]"
+		equation += f"\\big[\\big({'%.3f' % y} - ({weight})({x}) - ({bias})\\big) \\times ({x})\\big]"
 		if i != len(x_values) - 1:
 			equation += "+"
 	return equation
@@ -338,7 +338,7 @@ cost_derivative_str = "%.2f" % get_cost_derivative()
 
 Each partial derivative with respect to a variable tells us how the cost function would change if the variable changed. For example, if $w_1 = \py{weight}$, the partial derivative $\frac{dC}{dw_1}$ is equal to:
 \begin{align*}
-	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - (\py{weight})x_i - (\py{bias})) * x_i
+	\frac{dC}{dw_1} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - (\py{weight})x_i - (\py{bias})) \times x_i
 	\\
 	\frac{dC}{dw_1} & =
 	\begin{aligned}[t]
@@ -402,21 +402,21 @@ After we know for each variable whether we should increase it or decrease it, th
 	\noindent\begin{tabularx}{0.8\linewidth}{X X}
 		\vbox{
 			\begin{align*}
-				w_1' & = w_1 + (-\frac{dC}{dw_1} * \eta)
+				w_1' & = w_1 + (-\frac{dC}{dw_1} \times \eta)
 				\\
-				w_1' & = w_1 - \frac{dC}{dw_1} * \eta
+				w_1' & = w_1 - \frac{dC}{dw_1} \times \eta
 				\\
-				w_1' & = \py{weight} - (\py{cost_derivative_str}) * \eta
+				w_1' & = \py{weight} - (\py{cost_derivative_str}) \times \eta
 			\end{align*}
 		}
 		 &
 		\vbox{
 			\begin{align*}
-				b' & = b + (-\frac{dC}{db} * \eta)
+				b' & = b + (-\frac{dC}{db} \times \eta)
 				\\
-				b' & = b - \frac{dC}{db} * \eta
+				b' & = b - \frac{dC}{db} \times \eta
 				\\
-				b' & = \py{bias} - (\py{cost_derivative_bias_str}) * \eta
+				b' & = \py{bias} - (\py{cost_derivative_bias_str}) \times \eta
 			\end{align*}
 		}
 	\end{tabularx}
@@ -437,7 +437,7 @@ For example, if we set $\eta$ equal to \py{learning_rate}, then the new values f
 	\begin{tabularx}{0.8\linewidth}{X X}
 		\vbox{
 			\begin{align*}
-				w_1' & = \py{weight} - (\py{cost_derivative_str}) * \py{learning_rate}
+				w_1' & = \py{weight} - (\py{cost_derivative_str}) \times \py{learning_rate}
 				\\
 				w_1' & = \py{weight} - (\py{f3f(cost_derivative * learning_rate)})
 				\\
@@ -446,7 +446,7 @@ For example, if we set $\eta$ equal to \py{learning_rate}, then the new values f
 		} &
 		\vbox{
 			\begin{align*}
-				b' & = \py{bias} - (\py{cost_derivative_bias_str}) * \py{learning_rate}
+				b' & = \py{bias} - (\py{cost_derivative_bias_str}) \times \py{learning_rate}
 				\\
 				b' & = \py{bias} - (\py{f3f(cost_derivative_bias * learning_rate)})
 				\\
@@ -474,10 +474,10 @@ I created a Python program to run the above calculations for the values in Table
 	b = 2.472476099
 \end{align}
 
-If we substitute these values for $w_1$ and $b$ into our prediction function $f(W_i)$ and plot our function on a graph alongside the data from Table 2, we obtain the following graph:
+If we substitute these values for $w_1$ and $b$ into our prediction function $f(\text{Word}_i)$ and plot our function on a graph alongside the data from Table 2, we obtain the following graph:
 \begin{figure}[H]
 	\centering
-	\caption{A graph of our prediction function $f(W_i)$ using the values from equation 1}
+	\caption{A graph of our prediction function $f(\text{Word}_i)$ using the values from equation 1}
 	% TODO: plot the function in Excel
 	\includegraphics{}
 \end{figure}
@@ -597,14 +597,58 @@ def get_table_2_row(w):
 
 To incorporate all these features into our prediction function, we need to include more terms in our equation. If we define $w_f$ to represent the weight of feature $f$ and the value of feature $f$ of word $i$ as ${x_f}_i$, then our new prediction function would look like:
 \begin{align*}
-	f(W_i) & = w_1{x_1}_i + w_2{x_2}_i + ... + w_n{x_n}_i + b
+	f(\text{Word}_i) & = w_1{x_1}_i + w_2{x_2}_i + \dots + w_{10}{x_{10}}_i + b
 	\\
-	f(W_i) & = \Big(\sum_{f=1}^{n} w_f{x_f}_i\Big) + b
+	f(\text{Word}_i) & = \Big(\sum_{f=1}^{10} w_f{x_f}_i\Big) + b
 \end{align*}
 
 Our cost function would also change:
 \begin{align*}
-	C(f) = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(W_i))^2
+	C(f)                          & = \frac{1}{10} \sum_{i=1}^{10} (y_i - f(\text{Word}_i))^2
+	\\
+	C(w_1, w_2, \dots, w_{10}, b) & = \frac{1}{10} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{10}{x_{10}} - b)
+\end{align*}
+
+The new gradient $\nabla Q$ for our cost function would now be:
+\begin{align*}
+	\nabla Q & = \Big(\frac{dC}{dw_1}, \frac{dC}{dw_2}, \dots, \frac{dC}{dw_{10}}, \frac{dC}{db}\Big)
+	\\
+	\nabla Q & =
+	\begin{aligned}[t]
+		\Big(
+		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{10}{x_{10}}_i - b) \times {x_1}_i,
+		\\
+		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{10}{x_{10}}_i - b) \times {x_2}_i,
+		\\
+		& \vdots
+		\\
+		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{10}{x_{10}}_i - b) \times {x_{10}}_i,
+		\\
+		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{10}{x_{10}}_i - b)
+		\Big)
+	\end{aligned}
+\end{align*}
+
+After each iteration, we need to update all 10 weights:
+\begin{align*}
+	w_1' & = w_1 - \frac{dC}{dw_1} \times \eta,
+	\;
+	w_2' = w_2 - \frac{dC}{dw_2} \times \eta,
+	\;
+	\dots,
+	\;
+	w_{10}' = w_{10} - \frac{dC}{dw_{10}} \times \eta
+	\\
+	b' & = b - \frac{dC}{db} \times \eta
+\end{align*}
+
+We can simplify the above equations and the implementation of the machine learning algorithm using matrices.
+
+Let us denote $X_i$ as a 1 \times~N matrix containing all the values of the features of a word $\text{Word}_i$. Let us denote $W$ as a 1 \times~N matrix containing all the weights. Using these matrix definitions, we can rewrite our prediction function as:
+\begin{align*}
+f(W_i) & = \Big(\sum_{f=1}^{10} w_f{x_f}_i\Big) + b
+\\
+f(X) & = X \cdot W + b
 \end{align*}
 
 

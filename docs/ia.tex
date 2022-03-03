@@ -6,6 +6,7 @@
 \usepackage{titling}
 \usepackage{amsmath}
 \usepackage{ragged2e}
+\usepackage{float}
 
 \title{Using Machine Learning to Predict Typing Speed}
 \author{jjr117}
@@ -27,7 +28,7 @@
 
 One of my hobbies is competitive typing, where I compete with my friends to type a text as quickly as possible. I often use a website called TypeRacer, where your goal is to drive a racecar to the finish line, and the position of your racecar is determined by how many words you've typed correctly in the quote:
 
-\begin{figure}[hbt!]
+\begin{figure}[H]
 	\caption{A screenshot of a typing competition on the website \textit{TypeRacer}}
 	\includegraphics[width=\textwidth]{typeracer.png}
 \end{figure}
@@ -36,7 +37,7 @@ Your score is a measurement of your average typing speed at the end of the race.
 
 In TypeRacer, your typing speed determines the types of texts you'll be presented with: a lower typing speed gives you easier texts, while a higher typing speed gives you more difficult texts:
 
-\begin{figure}[hbt!]
+\begin{figure}[H]
 	\caption{Two different possible texts in TypeRacer. On the left, an easy text, and on the right, a more difficult text.}
 	\includegraphics[width=0.5\textwidth]{easy-text.png}
 	\includegraphics[width=0.5\textwidth]{hard-text.png}
@@ -91,9 +92,9 @@ After analyzing the data, I noticed some outliers in the data set. Occasionally,
 The WPM Ratio of a word depends on various features of the word, such as the length of the word and the amount of capital letters in the word.
 
 For example, if the typing speed of a word was linearly proportional to its length, then our predictive function might look like the following:
-\begin{align}
-	\text{WPM Ratio} = w_{\text{word length}} * (\text{word length}) + Bias
-\end{align}
+\begin{align*}
+	\text{WPM Ratio} = w_{\text{word length}} * (\text{word length}) + \text{Bias}
+\end{align*}
 
 This equation resembles the typical linear equation $y = mx + b$, where $w_{\text{word length}}$ represents the slope, or in other words, the amount that the WPM Ratio increases or decreases by when the word length is increased by 1.
 
@@ -145,39 +146,45 @@ def get_table():
 \end{pycode}
 % \end{noindent}
 
-\py{get_table()}
+\begin{table}
+	\caption{Examples of words that are short but have low WPM ratios (i.e. hard to type).}
+	\py{get_table()}
+\end{table}
 
-Even though these words are short, they contain capital letters and keys that need you to press the Shift key to type (\code{"} and \code{?}). This makes the word substantially slower to type, and isn't accounted for in Equation x.
+Even though these words are short, they contain capital letters and keys that need you to press the Shift key to type (\code{"} and \code{?}). This makes the word substantially slower to type, and isn't accounted for in Equation 1.
 
 Our function must take into account various features of the word that would affect typing speed. Some features, like the number of capital letters, will influence the word's typing speed more compared to other features, like whether the word starts with a vowel or a consonant.
 
 To account for the different influences of different features, we need to assign a different weight to each of them in our equation, which gives us an equation similar to the following:
-
 \begin{align*}
-	f(\text{word}) = w_1 * (\text{Feature 1}) + w_2 * (\text{Feature 2}) + ... + \text{Bias}
+	\text{WPM Ratio} = w_1 * (\text{Feature 1}) + w_2 * (\text{Feature 2}) + ... + \text{Bias}
 \end{align*}
 
 For example, if the only two features that influence the difficulty of a are the length of the word and the number of capital letters in the word, then the equation would become:
-
 \begin{align*}
-	\text{Difficulty} = w_{\text{word length}} * (\text{word length}) + w_{\text{capital letters}} * (\text{\# of capital letters}) + \text{Bias}
+	\text{WPM Ratio} = w_{\text{word length}} * (\text{word length}) + w_{\text{capital letters}} * (\text{\# of capital letters}) + \text{Bias}
 \end{align*}
 
-% where $w_{\text{word_length}}$ isn't necessarily the same as $w_{\text{capital letters}}$.
+In this equation, $w_{\text{word length}}$ isn't necessarily the same as $w_{\text{capital letters}}$. For example, if the magnitude of $w_{\text{word length}}$ is greater than $w_{\text{capital letters}}$, it means that the length of a word has more influence on the WPM ratio compared to the number of capital letters in the word.
 
-How do we find the optimal values of $w_{\text{feature}~i}$ that will give us the most accurate function for predicting a word's WPM ratio? This is where machine learning comes in.
+Let us define the WPM Ratio as a function that takes in a word $W_i$ as input and returns the sum of the feature weights multiplied with the feature values of $W_i$. If $w_i$ represents the weight for feature $i$, $x_{f_i}$ represents the feature value for feature $f$ of word $i$, and $b$ represents the bias term, then our WPM ratio equation can be written as:
+\begin{align*}
+	f(W_i) & = w_1{x_1}_i + w_2{x_2}_i + ... + w_n{x_n}_i + b
+	\\
+	f(W_i) & = \Big(\sum_{f=1}^{n} w_f{x_f}_i\Big) + b
+\end{align*}
 
-\section*{Machine Learning}
+In this equation, $f$ is our prediction function: given a word, it predicts the WPM ratio of the word based on its features. To create an accurate prediction function, we need to find optimal values of $w_f$ that will give us predicted WPM ratios that are as close as possible to actual WPM ratios from our data. To find optimal values of $w_f$, we need to use a cost function.
 
 \subsection*{The Cost Function}
 
-The cost function will inform our machine learning algorithm how accurate its weights are, and more importantly, how to adjust its weights in order to reduce the cost.
+The cost function will give us a way to measure how accurate our prediction function $f$ is, and more importantly, how we can adjust the weights $w_i$ in our prediction function in order to reduce the cost.
 
-One popular cost function used in machine learning is the MSE (Mean Squared Error). This function defines the cost as the squares of the difference between the actual data ($y_i$) and the predicted data ($f(x_i)$):
+One popular cost function used in machine learning is the MSE (Mean Squared Error). This function defines the cost as the squares of the difference between the actual data ($y_i$) and the predicted data ($f(W_i)$):
 \begin{align*}
-	C(f) & = \frac{1}{N}\big[(y_1 - f(x_1))^2 + (y_2 - f(x_2))^2 + ... + (y_n - f(x_n))^2]
+	C(f) & = \frac{1}{N}\big[(y_1 - f(W_1))^2 + (y_2 - f(W_2))^2 + ... + (y_n - f(W_n))^2]
 	\\
-	C(f) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(x_i))^2
+	C(f) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(W_i))^2
 \end{align*}
 
 To visualize this cost function, I've plotted the below data for a small set of words that have a clear correlation between word length and WPM Ratio:
@@ -205,57 +212,64 @@ def f3f(number):
 \end{pycode}
 % \end{noindent}
 
-\begin{tabularx}{\linewidth}{|X|X|X|}
-	\hline
-	Word        &
-	Word Length &
-	WPM Ratio
+\begin{table}[H]
+	\caption{The word length and WPM ratio for a small selection of words.}
+	\noindent\begin{tabularx}{\linewidth}{|X|X|X|}
+		\hline
+		Word        &
+		Word Length &
+		WPM Ratio
 
-	\py{get_table_row(0)}
-	\py{get_table_row(1)}
-	\py{get_table_row(2)}
-	\py{get_table_row(3)}
-	\py{get_table_row(4)}
-	\py{get_table_row(5)}
+		\py{get_table_row(0)}
+		\py{get_table_row(1)}
+		\py{get_table_row(2)}
+		\py{get_table_row(3)}
+		\py{get_table_row(4)}
+		\py{get_table_row(5)}
 
-	\\\hline
-\end{tabularx}
+		\\\hline
+	\end{tabularx}
+\end{table}
 
 A visual example of this cost function would look like:
 
 % TODO
-\includegraphics{mse-cost.png}
+\begin{figure}[H]
+	\centering
+	\caption{A graph of the values in Figure 4, where the blue lines between the line of best fit and the actual data points represent the cost.}
+	\includegraphics{mse-cost.png}
+\end{figure}
 
-The goal of our machine learning algorithm is to minimize this function: to find a set of weights for our prediction function $f$ such that $C(f)$ is as low as possible. A popular method for minimizing cost is by using gradient descent.
+The goal of our machine learning algorithm is to minimize the cost function: to find a set of weights for our prediction function $f$ such that $C(f)$ is as low as possible. A popular method for minimizing cost is by using gradient descent.
 
 \subsection*{Gradient Descent}
 
 Gradient descent involves using the derivative(s) of a function to find a function's local minimum. In our case, we need to find the local minimum of our cost function, $C$.
 
-Let's consider the case where our prediction function $f$ is linearly correlated with only one weight, the text length. For convenience, we'll denote "word $i$" as $W_i$ and "text length of word $i$" as $x_i$:
-\begin{align}
+Let's consider the case where our prediction function $f$ is linearly correlated with only one weight, the text length. If we let $x_i$ represent the "text length of word $i$", our prediction function would look like the following:
+\begin{align*}
 	f(W_i) = w_1x_i + b
-\end{align}
-
-The bias term $b$ is necessary because otherwise our machine learning algorithm would be forced to predict a line that passes through the origin, which wouldn't correlate with our data.
+\end{align*}
 
 For this definition of $f$, our cost function would look like the following:
-\begin{align}
+\begin{align*}
 	C(w_1, b) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(W_i))^2
 	\\
 	C(w_1, b) & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)^2
-\end{align}
+\end{align*}
 
-% TODO
-\includegraphics{cost-function.png}
+To visualize this cost function, we can use a 3D graph where the x-axis correlates with various values of $w_1$, the z-axis correlates with various values of $b$, and the y-axis represents the cost (the value of $C(w_1, b)$). Using the values from Table 2 for our values of $x_i$ and $y_i$, a visual representation of our cost function would look like the following graph:
+\begin{figure}[H]
+	\centering
+	\caption{A 3D visualization of our cost function.}
+	\includegraphics{cost-function.png}
+\end{figure}
 
-The goal of our machine learning algorithm is to minimize this cost function. In other words, our goal is to find a global minimum on the graph of $C(w_1, b)$.
-
-To find a minimum, we need to use the derivatives of $C(w_1, b)$. But, our cost function has more than one variable, $w_1$ and $b$. In this scenario, we need to use partial derivatives.
+The goal of our machine learning algorithm is to minimize this cost function. In other words, our goal is to find the minimum on the graph of $C(w_1, b)$. To find the minimum, we need to use the derivatives of $C(w_1, b)$. In particular, since our cost function has more than one variable, $w_1$ and $b$, we need to use partial derivatives.
 
 \subsection*{Partial Derivatives}
 
-For a function that takes multiple variables, the gradient of the function is a vector, where the  containing separate derivatives with respect to each variable. For our cost function, this means that the gradient, $\nabla Q$, is equal to:
+For a function that takes multiple variables, the gradient of the function is a vector where the $i$th value in the vector is the partial derivative of our function with respect to variable $i$. For our cost function, this means that the gradient, $\nabla Q$, is equal to:
 \begin{align*}
 	\nabla Q = \Big(\frac{dC}{dw_1}, \frac{dC}{db}\Big)
 \end{align*}
@@ -271,7 +285,7 @@ When calculating each partial derivative, the other input variables for the func
 
 Likewise, when calculating $\frac{dC}{db}$, the weight $w_1$ is treated as a constant:
 \begin{align*}
-	C(w_1)        & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)^2
+	C(w_1, b)        & = \frac{1}{N} \sum_{i=1}^{n} (y_i - w_1x_i - b)^2
 	\\
 	\frac{dC}{db} & = \frac{1}{N} \sum_{i=1}^{n} 2(y_i - w_1x_i - b) * -1
 	\\
@@ -446,7 +460,7 @@ For example, if we set $\eta$ equal to \py{learning_rate}, then the new values f
 However, how do we know what value of $\eta$ we should use? In other words, how much should increase or decrease $w_1$ by? If we increase/decrease the weight by too much, we could end up in a position of higher loss than we were before. If we move increase/decrease the weight too slowly, it will take a long time before we find the minimum:
 
 % TODO
-\begin{figure}[hbt!]
+\begin{figure}[H]
 	\caption{Increasing by too much would overshoot the local minimum; increasing by too little would take too long to reach the local minimum.}
 	\includegraphics{}
 \end{figure}
@@ -503,7 +517,7 @@ def get_table_2_row(w):
 \end{pycode}
 % \end{noindent}
 
-\begin{table}[hbt!]
+\begin{table}[H]
 	\caption{Three examples of features in words.  The following data might not match with the data expected from a QWERTY layout, and that's because when analyzing my typing data, I based it off the keyboard layout that I use—the Programmer Dvorak layout (please refer to Figure x in the Appendix)}
 	\begin{tabularx}{\linewidth}{|
 			p{70pt}|
@@ -563,9 +577,15 @@ All these features need to be incorporated into our prediction function $f$. If 
 	f(W_i) & = \Big(\sum_{f=1}^{n} w_f{x_f}_i\Big) + b
 \end{align*}
 
+Our cost function would also change:
+\begin{align*}
+	C(f) = \frac{1}{N} \sum_{i=1}^{n} (y_i - f(W_i))^2
+\end{align*}
+
+
 \section*{Appendix}
 
-\begin{figure}[hbt!]
+\begin{figure}[H]
 	\caption{The Programmer Dvorak Keyboard Layout}
 	\includegraphics[width=\textwidth]{programmer-dvorak.png}
 \end{figure}

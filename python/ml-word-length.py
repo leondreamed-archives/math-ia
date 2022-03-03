@@ -64,15 +64,22 @@ epochs = 100
 def train(weights, features, targets):
 	global weights_history
 
-	epochs = 100000
 	learning_rate = 0.01
-	for epoch in range(epochs):
+	epoch = 0
+	while True:
 		next_weights = update_weights(features, targets, weights, learning_rate)
 
 		cost = cost_function(features, targets, weights)
 
 		weights = next_weights
-		print(weights)
+
+		new_cost = cost_function(features, targets, weights)
+
+		if cost - new_cost < 1e-9:
+			print("Epoch: ", epoch)
+			break
+
+		epoch += 1
 
 		weights_history.append(next_weights)
 	return weights
@@ -124,6 +131,9 @@ def plot_line(weights):
 
 	plt.plot(features, predictions)
 	plt.scatter(features, targets)
+	plt.title("Word Length vs. WPM Ratio")
+	plt.xlabel("Word Length")
+	plt.ylabel("WPM Ratio")
 	plt.show()
 
 final_weights = train(weights, features_of_words, targets)

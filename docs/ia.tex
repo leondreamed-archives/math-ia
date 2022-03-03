@@ -100,7 +100,7 @@ This equation resembles the typical linear equation $y = mx + b$, where $w_{\tex
 
 However, when we plot the graph of word length against WPM Ratio, we get the following figure:
 
-\begin{figure}
+\begin{figure}[H]
 	\caption{Word Length vs. WPM Ratio}
 	\includegraphics{word-length-vs-wpm.png}
 \end{figure}
@@ -461,14 +461,39 @@ However, how do we know what value of $\eta$ we should use? In other words, how 
 
 % TODO
 \begin{figure}[H]
+	\centering
 	\caption{Increasing by too much would overshoot the local minimum; increasing by too little would take too long to reach the local minimum.}
 	\includegraphics{}
 \end{figure}
 
 The optimal choice of $\eta$ will vary for different situations, but there are heuristics that can help. When the learning rate is too high, the cost function will increase infinitely, so whenever it happens in practice you would decrease the learning rate by a % TODO: forgot the word for "power of 10"
 
+I created a Python program to run the above calculations for the values in Table 2 until the difference between $C(w_1, b)$ and $C(w_1', b')$ was less than $10^-9$, indicating that the machine learning model had converged. I set the learning rate $\eta$ to 0.01, and after 8341 iterations, the program outputted the following values for $w_1$ and $b$ (to 9 decimal places):
+\begin{align}
+	w_1 = -0.105086863 \\
+	b = 2.472476099
+\end{align}
+
+If we substitute these values for $w_1$ and $b$ into our prediction function $f(W_i)$ and plot our function on a graph alongside the data from Table 2, we obtain the following graph:
+\begin{figure}[H]
+	\centering
+	\caption{A graph of our prediction function $f(W_i)$ using the values from equation 1}
+	% TODO: plot the function in Excel
+	\includegraphics{}
+\end{figure}
+
+In my program, I've also tracked the value of the cost function $C(w_1, b)$ after each iteration. Plotting the cost against the iteration number gives us the following graph:
+\begin{figure}[H]
+	% TODO
+	\centering
+	\caption{A graph of cost versus iteration number.}
+	\includegraphics{}
+\end{figure}
+
+However, as indicated by the graph in Table 3, the WPM ratio isn't just correlated with the word length. Thus, we need to apply our machine learning algorithms for a prediction function that takes into account more features in addition to the word length.
+
 \subsection*{Analyzing More Features}
-However, as indicated by Figure x, a word's WPM ratio doesn't only depend on the word length, but also features like:
+There are many characteristics of a word that can affect its WPM ratio. Below is a list of features that I will be analyzing and using in creating an accurate prediction function for predicting the WPM ratio of a word:
 
 \begin{itemize}
 	\item Whether the word is common (1 if the word is included within the top 1000 most common English words, and 0 otherwise).
@@ -482,7 +507,7 @@ However, as indicated by Figure x, a word's WPM ratio doesn't only depend on the
 	\item The number of letters typed with the right hand.
 \end{itemize}
 
-Examples of these various features of words and how they would be stored can be found in Table 1:
+I've created a program that extracts these features from every word. Table 3 contains three examples of words and the value of each of these features  for these words:
 
 % \begin{noindent}
 \begin{pycode}
@@ -570,7 +595,7 @@ def get_table_2_row(w):
 	\end{tabularx}
 \end{table}
 
-All these features need to be incorporated into our prediction function $f$. If we define feature $f$ of word $i$ as ${x_f}_i$, then our new prediction function would look like:
+To incorporate all these features into our prediction function, we need to include more terms in our equation. If we define $w_f$ to represent the weight of feature $f$ and the value of feature $f$ of word $i$ as ${x_f}_i$, then our new prediction function would look like:
 \begin{align*}
 	f(W_i) & = w_1{x_1}_i + w_2{x_2}_i + ... + w_n{x_n}_i + b
 	\\

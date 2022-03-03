@@ -467,7 +467,7 @@ However, how do we know what value of $\eta$ we should use? In other words, how 
 	\includegraphics{todo.png}
 \end{figure}
 
-The optimal choice of $\eta$ will vary for different situations, but there are heuristics that can help. When the learning rate is too high, the cost function will increase infinitely, so whenever it happens in practice you would decrease the learning rate by a % TODO: forgot the word for "power of 10"
+The optimal choice of $\eta$ will vary for different situations, but there are heuristics that can help. When the learning rate is too high, the cost function will increase infinitely, so whenever it happens in practice you would decrease the learning rate by an order of magnitude.
 
 I created a Python program to run the above calculations for the values in Table 2 until the difference between $C(w_1, b)$ and $C(w_1', b')$ was less than $10^-9$, indicating that the machine learning model had converged. I set the learning rate $\eta$ to 0.01, and after 8341 iterations, the program outputted the following values for $w_1$ and $b$ (to 9 decimal places):
 \begin{align}

@@ -630,7 +630,7 @@ After each iteration, we need to update all 10 weights:
 	b'   & = b - \frac{dC}{db} \times \eta
 \end{align*}
 
-We can simplify the above equations and the implementation of the machine learning algorithm using vectors.
+The above equations involve many separate variables, which makes implementing the algorithm more difficult. Luckily, we can simplify the above equations using vectors.
 
 Let us denote $\vec{X_i}$ as a vector whose length is 10, which is equal to the number of features in each word. $\vec{X_i}$ contains all the values of the features of $\text{Word}_i$. Let us denote $\vec{W}$ as a vector also of length 10 containing all the weights for each feature. Using these vector definitions, we can use vectors to represent our prediction function:
 \begin{align*}

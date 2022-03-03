@@ -644,19 +644,19 @@ After each iteration, we need to update all 10 weights:
 
 We can simplify the above equations and the implementation of the machine learning algorithm using vectors.
 
-Let us denote $\vec{X_i}$ as a vector of length $(\text{\# features}) + 1$ containing all the values of the features of $\text{Word}_i$. Let us denote $\vec{W}$ as a vector containing all the weights, including the value of the bias at the end. Using these vector definitions, we can simplify our prediction function:
+Let us denote $\vec{X_i}$ as a vector whose length is 10, which is equal to the number of features in each word. $\vec{X_i}$ contains all the values of the features of $\text{Word}_i$. Let us denote $\vec{W}$ as a vector also of length 10 containing all the weights for each feature. Using these vector definitions, we can use vectors to represent our prediction function:
 \begin{align*}
 	f(\text{Word}_i) & = \Big(\sum_{f=1}^{10} w_f{x_f}_i\Big) + b
 	\\
-	f(\vec{X_i})     & = \vec{X_i} \cdot \vec{W} + b
+	f(\text{Word}_i) & = \vec{X_i} \cdot \vec{W} + b
 \end{align*}
 
-To further simplify this equation, we can define $\vec{X}_i$ as a vector of length $(\text{\# features}) + 1$ instead, where in addition to containing all the values of the features of $\text{Word}_i$, it also includes a constant 1 at the end:
+To further simplify this equation, we can define $\vec{X}_i$ as a vector of length 11 instead—1 greater than the number of features in each word. In addition to containing all the values of the features of $\text{Word}_i$, we add a constant 1 to the end of $\vec{X}_i$:
 \begin{align*}
 	\vec{X}_i = ({x_1}_i, {x_2}_i, \dots, {x_{10}}_i, 1)
 \end{align*}
 
-This way, if we redefined $\vec{W}$ to contain all the weights \textit{and} the bias term:
+This way, if we redefined $\vec{W}$ to be a vector of length 11 which contains all the weights \textit{and} the bias term:
 \begin{align*}
 	\vec{W} = (w_1, w_2, \dots, w_{10}, b)
 \end{align*}
@@ -679,7 +679,7 @@ Which is equal to our initial prediction function.
 
 Using vectors, we can also simplify our cost function:
 \begin{align*}
-	C(f)          & = \frac{1}{10} \sum_{i=1}^{10} (y_i - f(\text{Word}_i))^2
+	C(f)       & = \frac{1}{10} \sum_{i=1}^{10} (y_i - f(\text{Word}_i))^2
 	\\
 	C(\vec{W}) & = \frac{1}{10} \sum_{i=1}^{10} (y_i - \vec{W} \cdot \vec{X_i})^2
 \end{align*}
@@ -706,10 +706,10 @@ And finally, we can simplify our gradient $\nabla Q$:
 
 With vectors, updating the weights now becomes a simple one-liner:
 \begin{align*}
-	\vec{W}' = W - \nabla Q \times \eta
+	\vec{W}' = \vec{W} - \eta\nabla Q
 \end{align*}
 
-Not only do vectors allow us to represent our equations more succinctly, but they also make implementing them with code much easier.
+Not only do vectors allow us to represent our equations more succinctly, but they also make implementing them in code much easier.
 
 \section*{Appendix}
 

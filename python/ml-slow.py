@@ -82,7 +82,7 @@ weights_history = []
 def train(weights, features, targets):
     global weights_history
 
-    epochs = 10
+    epochs = 100000
     learning_rate = 0.008
     for epoch in range(epochs):
         next_weights = update_weights(features, targets, weights, learning_rate)
@@ -163,6 +163,7 @@ def parse_words(word_stats):
 
 
 targets, features_of_words, weights = parse_words(word_stats)
+print(targets, features_of_words, weights)
 
 
 def plot_loss_function():
@@ -173,17 +174,6 @@ def plot_loss_function():
     plt.plot(range(len(losses)), losses)
     plt.show()
 
-
-# plt.plot(weights, cost_y)
-# plt.plot(weights, cost_dy, color='red')
-
-# plt.title("Weight vs. Cost")
-# plt.xlabel("Weight")
-# plt.ylabel("Cost")
-
-# plt.show()
-
-
 def plot_line(weights):
     print(weights)
     num_words = len(features_of_words)
@@ -193,8 +183,8 @@ def plot_line(weights):
     plt.scatter(range(num_words), targets, color="green", s=1)
     plt.show()
 
-
 final_weights = train(weights, features_of_words, targets)
+print("final: ", final_weights)
 
 # plot_loss_function()
-plot_line(final_weights)
+# plot_line(final_weights)

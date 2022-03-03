@@ -26,16 +26,18 @@
 
 \section*{Introduction}
 
-One of my hobbies is competitive typing, where I compete with my friends to type a text as quickly as possible. I often use a website called TypeRacer, where your goal is to drive a racecar to the finish line, and the position of your racecar is determined by how many words you've typed correctly in the quote:
+One of my hobbies is competitive typing, where I compete with my friends to type a text as quickly as possible. We often use a website called TypeRacer, where your goal is to drive a racecar to the finish line, and the position of your racecar is determined by how many words you've typed correctly in a certain text:
 
 \begin{figure}[H]
 	\caption{A screenshot of a typing competition on the website \textit{TypeRacer}}
 	\includegraphics[width=\textwidth]{typeracer.png}
 \end{figure}
 
-Your score is a measurement of your average typing speed at the end of the race. Typing speed is measured in the units "words per minute" ("wpm" for short), and each word is defined as five characters.
+Your score at the end of the race is a measurement of your average typing speed throughout the text. Typing speed is measured in the units "words per minute" ("wpm" for short), where each "word" is defined as five characters.
 
-In TypeRacer, your typing speed determines the types of texts you'll be presented with: a lower typing speed gives you easier texts, while a higher typing speed gives you more difficult texts:
+However, not all texts are created equal. Some texts are harder to type than others, whether it's from having longer words, frequent capital letters, numbers, etc.
+
+In TypeRacer, your average typing speed from the last 10 rounds you've played determines the types of texts you'll be presented with: a lower average typing speed gives you easier texts, while a higher average typing speed gives you more difficult texts:
 
 \begin{figure}[H]
 	\caption{Two different possible texts in TypeRacer. On the left, an easy text, and on the right, a more difficult text.}
@@ -43,35 +45,20 @@ In TypeRacer, your typing speed determines the types of texts you'll be presente
 	\includegraphics[width=0.5\textwidth]{hard-text.png}
 \end{figure}
 
+Currently, the way TypeRacer determines the difficulty of a text is through data collected from random players typing the text. If, on average, the players' speed on the text is slower than their average speed overall, then the text is classified as more difficult. If the players' speed on the text is faster than their speed overall, then the text is classified as less difficult.
 
-However, not all texts are created equal. Some texts are harder to type than others, whether it's from having longer, more complex words, frequent capital letters, numbers, etc.
+While this approach works fore TypeRacer, there are other scenarios where it would be better to predict a text's difficulty without needing to collect data from users to accurately determine the text's difficulty. For example, other typing sites may not have as large of a user base as TypeRacer, and they may need to manually classify the difficulty of various texts. In addition, the text difficulty that is calculated by TypeRacer is an average of the performance of all TypeRacer players, which is biased towards the QWERTY keyboard layout since that's the most common layout. However, I don't use the QWERTY layout, but rather a modification of the less-popular Dvorak layout called Programmer Dvorak (see Appendix). Thus, a word that may be difficult for QWERTY users to type (e.g. \texttt{minimum}) might be easier for me because my keys are arranged differently.
 
-Predicting the difficulty of a text is useful. For example, the typing site that I practice on, TypeRacer, will display different sets of texts depending . For example, these are two quotes that can appear in a TypeRacer race:
-
-
-Even though Quote 1 is shorter than Quote 2, the difficult word at the start of Quote 1 makes it significantly more difficult to type.
-
-Currently, the way TypeRacer classifies the difficulty of a newly added quote is through . Each player has an average typing speed that is calculated based on their best scores for each quote, and if the
-
-At first, I considered using the length of the text might be to use the length of the text in determining its difficulty. While this works for the two texts shown in Figure 1, it's not a flawless approach. For example, the following two texts are possible texts you can encounter in TypeRacer:
+At first glance, it might seem that the difficulty of a text is correlated with its text length. However, this approach isn't flawless. Consider the following two texts that can appear on TypeRacer:
 
 \begin{textexamples}
 	\textbf{Text 1}: Supercalifragilisticexpialidocious is Vielle's favorite word to type on TypeRacer.
 	\textbf{Text 2}: For someone who was never meant for this world, I must confess I'm suddenly having a hard time leaving it.
 \end{textexamples}
 
-Even though Text 1 has fewer characters than Text 2, it is still considerably more difficult to type because of the complex first word.
+Even though Text 1 has fewer characters than Text 2, it is still considerably more difficult to type because of the complex first word. This indicates that a text's difficulty is determined by many other factors than just the text length, like the amount of capital letters in the text, the average word length in the text, etc.
 
-, but there are many more characteristics of words that affect the speed at which they are typed. For example, one of these characteristics is the fingers you use to type the word.
-
-\includegraphics{finger-map.png}
-
-Using this standard finger map, when typing the word \texttt{mummy} on the QWERTY keyboard, you would exclusively use your right index finger to type the entire word, making it significantly slower to type compared to a word like \texttt{there}, which doesn't involve using the same finger to type two consecutive letters.
-
-\begin{textexamples}
-\end{textexamples}
-
-The characteristics of how difficult a word is to type extends beyond these two examples, and each characteristic has a different amount of influence on how quickly I type the word. In order to determine the significance of these various characteristics in the difficulty of a word, machine learning can be applied.
+My goal in this exploration is to create a program that takes a certain text as input and outputs a prediction of how fast I would the text based on various characteristics of the text. This program will use machine learning, which involves the use of algorithms and statistical models to analyze and detect patterns in data. But, in order to apply machine learning, I first need to collect data that would be analyzed by machine learning.
 
 \section*{Gathering Data}
 

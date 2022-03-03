@@ -663,14 +663,14 @@ This way, if we redefined $\vec{W}$ to be a vector of length 11 which contains a
 
 Our prediction function could then be written as:
 \begin{align*}
-	f(\vec{X}_i) = \vec{X_i} \cdot \vec{W}
+	f(\text{Word}_i) = \vec{X_i} \cdot \vec{W}
 \end{align*}
 
 Since this would be equal to:
 \begin{align*}
-	f(\vec{X}_i) & = w_1{x_i}_1 + w_2{x_i}_2 + \dots + w_{10}{x_i}_{10} + (1)(b)
+	f(\text{Word}_i) & = w_1{x_i}_1 + w_2{x_i}_2 + \dots + w_{10}{x_i}_{10} + (1)(b)
 	\\
-	f(\vec{X}_i) & = \Big(\sum_{f=1}^{10} w_f{x_f}_i\Big) + b
+	f(\text{Word}_i) & = \Big(\sum_{f=1}^{10} w_f{x_f}_i\Big) + b
 \end{align*}
 
 Which is equal to our initial prediction function.

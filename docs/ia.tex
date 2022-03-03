@@ -451,7 +451,10 @@ However, how do we know what value of $\eta$ we should use? In other words, how 
 	\includegraphics{}
 \end{figure}
 
-The optimal choice of $\eta$ will vary for different problems, but there are heuristics that can help.
+The optimal choice of $\eta$ will vary for different situations, but there are heuristics that can help. When the learning rate is too high, the cost function will increase infinitely, so whenever it happens in practice you would decrease the learning rate by a % TODO: forgot the word for "power of 10"
+
+\subsection*{Analyzing More Features}
+However, as indicated by Figure x, a word's WPM ratio doesn't only depend on the word length, but also features like:
 
 \begin{itemize}
 	\item Whether the word is common (1 if the word is included within the top 1000 most common English words, and 0 otherwise).
@@ -465,7 +468,7 @@ The optimal choice of $\eta$ will vary for different problems, but there are heu
 	\item The number of letters typed with the right hand.
 \end{itemize}
 
-\textbf{Note:} The data in the following tables might not match with the data you'd expect on a QWERTY layout, and that's because when analyzing my typing data, I based it off the keyboard layout that I use—the Programmer Dvorak layout—which looks like this:
+Examples of these various features of words and how they would be stored can be found in Table 1:
 
 % \begin{noindent}
 \begin{pycode}
@@ -501,7 +504,7 @@ def get_table_2_row(w):
 % \end{noindent}
 
 \begin{table}[hbt!]
-	\caption{Three examples of features in words}
+	\caption{Three examples of features in words.  The following data might not match with the data expected from a QWERTY layout, and that's because when analyzing my typing data, I based it off the keyboard layout that I use—the Programmer Dvorak layout (please refer to Figure x in the Appendix)}
 	\begin{tabularx}{\linewidth}{|
 			p{70pt}|
 			>{\RaggedRight}X|
@@ -553,9 +556,19 @@ def get_table_2_row(w):
 	\end{tabularx}
 \end{table}
 
+All these features need to be incorporated into our prediction function $f$. If we define feature $f$ of word $i$ as ${x_f}_i$, then our new prediction function would look like:
+\begin{align*}
+	f(W_i) & = w_1{x_1}_i + w_2{x_2}_i + ... + w_n{x_n}_i + b
+	\\
+	f(W_i) & = \Big(\sum_{f=1}^{n} w_f{x_f}_i\Big) + b
+\end{align*}
+
+\section*{Appendix}
+
 \begin{figure}[hbt!]
 	\caption{The Programmer Dvorak Keyboard Layout}
 	\includegraphics[width=\textwidth]{programmer-dvorak.png}
 \end{figure}
+
 
 \end{document}

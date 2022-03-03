@@ -92,7 +92,7 @@ weights_history = []
 def train(weights, features, targets):
     global weights_history
 
-    epochs = 100
+    epochs = 1000
     learning_rate = 0.008
     for epoch in range(epochs):
         next_weights = update_weights(features, targets, weights, learning_rate)

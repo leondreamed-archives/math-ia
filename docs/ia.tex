@@ -496,18 +496,19 @@ However, as indicated by the graph in Table 3, the WPM ratio isn't just correlat
 There are many characteristics of a word that can affect its WPM ratio. Below is a list of features that I will be analyzing and using in creating an accurate prediction function for predicting the WPM ratio of a word:
 
 \begin{itemize}
-	\item Whether the word is common (1 if the word is included within the top 1000 most common English words, and 0 otherwise).
-	\item The number of capital letters in the word.
 	\item The number of characters in the word.
+	\item The number of capital letters in the word.
+	\item The amount of times the same finger is used to type consecutive letters in the word. For example, the word "mummy" requires using the right index finger five times in a row on a QWERTY keyboard.
 	\item The number of sets of "double letters" in the word. For example, the word "sheep" has 1 set of double letters, and the word "bittersweet" has two sets of double letters.
-	\item The number of letters in the home row of the keyboard (the row with the letters "asdf" on the QWERTY layout).
-	\item The number of letters that require pressing the "Shift" key to type.
-	\item The amount of times the same finger is used to type consecutive letters in the word. For example, the word "mummy" requires using the right index finger five times in a row on a QWERTY layout.
+	\item The number of letters in the home row of the keyboard (on a QWERTY keyboard, this is the row with the letters "asdf").
 	\item The number of letters typed with the left hand.
 	\item The number of letters typed with the right hand.
+	\item The number of numbers in the word.
+	\item The number of letters that require pressing the "Shift" key to type.
+	\item Whether the word is common (1 if the word is included within the top 1000 most common English words, and 0 otherwise).
 \end{itemize}
 
-I've created a program that extracts these features from every word. Table 3 contains three examples of words and the value of each of these features  for these words:
+I've created a program that extracts these features from every word. Table 3 contains three examples of words processed by my program and the value of each of these features for these words:
 
 % \begin{noindent}
 \begin{pycode}

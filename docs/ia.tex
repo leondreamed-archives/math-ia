@@ -59,13 +59,18 @@ Thus, my goal in this exploration is to create a program that takes a certain te
 
 In order to create a machine learning algorithm that predicts how fast I can type a certain text based on the text features, we need to collect a large amount of data that includes various texts and the speed at which I type them. Luckily, I've been active on TypeRacer for over 5 years now, and over these 5 years I've typed over 8000 texts on my account.
 
-I created a program that automatically scrapes the race data from each of my 8000+ texts. Since TypeRacer doesn't have an official way to collect this data, I had to use web scraping that retrieved the entire web page for each of my 8000+ races. Each web page contained a typing log that included the exact time I pressed each keystroke, which is crucial so that I can measure the typing speed of each individual word. With the data collected, it was now time to analyze the data.
+I created a program that automatically scrapes the race data from each of my 8000+ texts. Since TypeRacer doesn't have an official way to collect this data, I had to use web scraping that retrieved the entire web page for each of my 8000+ races. Each web page contained a typing log that included the exact time I pressed each keystroke, which is crucial so that I can measure the typing speed of each individual word.
+
+I decided that for the scope of this exploration, I will only be using words that I've typed with 100\% accuracy (in other words, typed without making any mistakes). This is because accuracy is a fairly random measurement: just because I typed a word inaccurately once doesn't mean that the word is necessarily harder to type—it might have just been "bad luck." Thus, in my data, I filtered out all the words that I didn't type perfectly and was left with 20454 unique words.
 
 \section*{Analyzing Data}
 
-Thus, to take into consideration the gradual increase in my typing speed overtime, the typing speed of a word should be measured relative to my average speed at the time.
+Thus, to take into consideration the gradual increase in my typing speed overtime, the typing speed of a word should be measured relative to my average speed at the time. Thus, instead of using WPM to measure a word's difficulty (since my average WPM changes over time), I've instead use a measurement of WPM ratio that compares the speed in WPM at which I typed the word at with my average monthly WPM at the time of typing the word:
+\begin{align*}
+	\text{WPM Ratio} & = \frac{\text{speed at which word was typed in WPM}}{\text{Average monthly WPM at the time of typing the word}}
+\end{align*}
 
-After analyzing the data, I noticed some outliers in the data set. Occasionally, I take a short breather in the middle of a typing race if I'm making too many mistakes, and this is reflected in some of the data as it causes my algorithm to calculate abnormally low speeds for some words. To counter this problem, I decided to take the median of the wpm ratios, as it wouldn't be as affected by outlier data compared to the mean.
+After analyzing the data, I noticed some outliers in the data set. Occasionally, I take a short breather in the middle of a typing race if I'm making too many mistakes, and this is reflected in some of the data as it causes my algorithm to calculate abnormally low speeds for some words. To counter this problem, I decided to take the median of the WPM ratios whenever there are multiple WPM ratios for a single word (as a result of typing the same text multiple times or the word appearing in multiple different texts). I decided to use the median instead of the mean as the median wouldn't be as affected by outlier data compared to the mean.
 
 \section*{Predicting Typing Speed}
 
@@ -754,6 +759,10 @@ Using the above vector equations, I've implemented a Python program that process
 	 & = \py{final_weights[9]}
 \end{align*}
 
+A negative weight indicates that the feature makes a text more difficult and a positive weight indicates that the feature makes a text easier. If a feature weight is larger, it indicates that the feature has more influence over the difficulty of a text. As expected, whenever a text has more characters, more capital letters, more same-finger consecutive letters, and more letters requiring shift, it makes the text harder. Whenever the text is common or has more home row letters, it makes the text easier.
+
+However, what I found interesting is that the number of double letters seems to make a text easier to type, which is contrary to intuition that typing the same letter twice would typically slow you down. I believe that the reason for this is because compared to other features of a text (e.g. capital letters), double letters are quicker to type, so my machine learning algorithm ended up correlating double letters to typing a word faster.
+
 As expected, the cost vs. iteration graph shows the cost decreasing as more iterations are performed:
 \begin{figure}[H]
 	\caption{The graph of iteration number versus cost ($C(\vec{W})$) plotted on a logarithmic scale.}
@@ -785,30 +794,42 @@ The WPM of an entire text is calculated by the number of words in the phrase (an
 
 Since the prediction function only works on words, we can apply the prediction function on each word in the text. Then, we can convert the WPM ratio for each word into how long it would take for me to type the word using the following equations:
 \begin{align*}
-f(\text{Word}_i) & = \text{WPM Ratio}_i
-\\
-\text{WPM Ratio}_i * \text{Average WPM} & = x~\frac{\text{words}}{\text{minute}}
-\\
-x~\frac{\text{words}}{\text{minute}} \times 5 \frac{\text{characters}}{\text{word}} & = 5x \frac{\text{characters}}{\text{minute}}
-\\
-& = \frac{1}{5x} \frac{\text{minutes}}{\text{character}}
-\\
-\text{\# minutes to type}~\text{Word}_i = m_i & = \frac{1}{5x} * Length(\text{Word}_i)
+	f(\text{Word}_i)                                                                    & = \text{WPM Ratio}_i
+	\\
+	\text{WPM Ratio}_i * \text{Average WPM}                                             & = x~\frac{\text{words}}{\text{minute}}
+	\\
+	x~\frac{\text{words}}{\text{minute}} \times 5 \frac{\text{characters}}{\text{word}} & = 5x \frac{\text{characters}}{\text{minute}}
+	\\
+	                                                                                    & = \frac{1}{5x} \frac{\text{minutes}}{\text{character}}
+	\\
+	\text{\# minutes to type}~\text{Word}_i = m_i                                       & = \frac{1}{5x} * Length(\text{Word}_i)
 \end{align*}
 
 Then, we can add the value of $m_i$ for each word in the text to find the predicted total number of minutes to type the entire text. By combining this with the number of words in the text, we can calculate the predicted WPM of typing the entire text:
 \begin{align*}
 	\text{Total minutes to type text} & = \sum_{i=1}^{\text{\# of words}} m_i
 	\\
-	\text{\# words in text} & = \frac{Length(\text{Word}_i)}{5}
+	\text{\# words in text}           & = \frac{Length(\text{Word}_i)}{5}
 	\\
-	\text{WPM of Text} & = \frac{\text{Total minutes to type text}}{\text{\# words in text}}
+	\text{WPM of Text}                & = \frac{\text{Total minutes to type text}}{\text{\# words in text}}
 \end{align*}
 
+To test the accuracy of my prediction function on entire texts, I applied the above formula to predict the WPM of all texts that I typed in TypeRacer with 100\% accuracy (the texts need to have 100\% accuracy as I didn't take accuracy into account when designing the machine learning model, so it wouldn't take into account races where I type a word slow because I typed it wrong the first time):
+
+\begin{figure}
+	\caption{The predicted WPM using my prediction function $f$ compared with the actual WPM of the races}
+	\includegraphics[width=\textwidth]{predicted-vs-actual-wpm.png}
+\end{figure}
+
+While there is a lot of variation in the graph, the WPM predictions do tend to increase as the actual WPM scores increase. This indicates that, overall, my prediction function was able to correlate certain text features with easier texts and other text features with difficult texts and produce a somewhat accurate WPM prediction based on these text features.
 
 \section*{Conclusion}
 
-TODO
+In conclusion, I was able to successfully create a machine learning algorithm that correlated certain text features with making the text easier to type and certain text features with making the text harder to type. While the machine learning algorithm wasn't the most accurate with its predictions (i.e. there was a lot of variation), its predictions did manage to follow the general trend: on average, as the actual WPM Ratios increased, the predicted WPM Ratios increased as well.
+
+Even though I would consider my machine learning model generally successful, there is still much room for improvement. There are many more features in a word that I didn't get to analyze in this exploration. In addition, many of these features aren't necessarily linearly correlated, which would change my prediction function $f$ and my cost function $C$. However, even with these changes, I would still be able to apply gradient descent to these new functions as long as I can calculate the derivative of these non-linear correlations.
+
+Overall, I'm very proud of implementing my very first machine learning algorithm, especially using a data set that came from my own activity over the past 5 years of playing TypeRacer (who knew it would end up becoming immensely valuable for a math exploration?). I hope to apply machine learning to various other areas of my life in the future.
 
 \section*{Appendix}
 

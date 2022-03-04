@@ -647,12 +647,12 @@ Let us denote $\vec{X_i}$ as a vector whose length is 9, which is equal to the n
 	f(\text{Word}_i) & = \vec{X_i} \cdot \vec{W} + b
 \end{align*}
 
-To further simplify this equation, we can define $\vec{X}_i$ as a vector of length 11 instead—1 greater than the number of features in each word. In addition to containing all the values of the features of $\text{Word}_i$, we add a constant 1 to the end of $\vec{X}_i$:
+To further simplify this equation, we can define $\vec{X}_i$ as a vector of length 10 instead—1 greater than the number of features in each word. In addition to containing all the values of the features of $\text{Word}_i$, we add a constant 1 to the end of $\vec{X}_i$:
 \begin{align*}
 	\vec{X}_i = ({x_1}_i, {x_2}_i, \dots, {x_{9}}_i, 1)
 \end{align*}
 
-This way, if we redefined $\vec{W}$ to be a vector of length 11 which contains all the weights \textit{and} the bias term:
+This way, if we redefined $\vec{W}$ to be a vector of length 10 which contains all the weights \textit{and} the bias term:
 \begin{align*}
 	\vec{W} = (w_1, w_2, \dots, w_{9}, b)
 \end{align*}
@@ -726,7 +726,7 @@ final_weights = [
 \end{pycode}
 % \end{noindent}
 
-Using the above vector equations, I've implemented a Python program that processes the features of all 20454 words and uses their actual WPM ratio to find the optimal set of weights that minimizes the cost function $C(\vec{W})$. I used a learning rate of 0.008 and trained my model over 100000 iterations, which took around 12 hours on my computer. After the program finished executing, it produced the following weights:
+Using the above vector equations, I've implemented a Python program that processes the features of all 20454 words and uses their actual WPM ratio as the values of $y_i$ to find the optimal set of weights that minimizes the cost function $C(\vec{W})$. I used a learning rate of 0.008 and trained my model over 100000 iterations, which took around 12 hours on my computer. After the program finished executing, it produced the following weights:
 \begin{align*}
 	w_{\text{\# of characters}}
 	 & = \py{final_weights[0]}
@@ -759,7 +759,7 @@ Using the above vector equations, I've implemented a Python program that process
 	 & = \py{final_weights[9]}
 \end{align*}
 
-A negative weight indicates that the feature makes a text more difficult and a positive weight indicates that the feature makes a text easier. If a feature weight is larger, it indicates that the feature has more influence over the difficulty of a text. As expected, whenever a text has more characters, more capital letters, more same-finger consecutive letters, and more letters requiring shift, it makes the text harder. Whenever the text is common or has more home row letters, it makes the text easier.
+A negative weight indicates that the feature makes a text more difficult and a positive weight indicates that the feature makes a text easier. If a feature weight is larger, it indicates that the feature has more influence over the difficulty of a text. As expected, whenever a text has more characters, more capital letters, more same-finger consecutive letters, and more letters requiring the Shift key, it makes the text harder. Whenever the text is common or has more home row letters, it makes the text easier.
 
 However, what I found interesting is that the number of double letters seems to make a text easier to type, which is contrary to intuition that typing the same letter twice would typically slow you down. I believe that the reason for this is because compared to other features of a text (e.g. capital letters), double letters are quicker to type, so my machine learning algorithm ended up correlating double letters to typing a word faster.
 
@@ -772,7 +772,7 @@ As expected, the cost vs. iteration graph shows the cost decreasing as more iter
 To see how accurate my predictions were visually, I plotted a point for each text: one point that represented the predicted WPM Ratio from my equation and one point that represented the actual WPM Ratio for that text. When plotting this graph, I sorted all the texts by their WPM Ratio so that it's easier to see how my prediction function compares against the actual values:
 
 \begin{figure}[H]
-	\caption{A graph of text number vs. WPM Ratio with the orange dots representing predictions from my prediction function and the green dots representing the actual WPM Ratio values of a word.}
+	\caption{A graph of text number vs. WPM Ratio. The orange dots represent predictions from my prediction function and the green dots represent the actual WPM Ratio values of a word.}
 	\includegraphics[width=\textwidth]{predictions.png}
 \end{figure}
 
@@ -810,10 +810,10 @@ Then, we can add the value of $m_i$ for each word in the text to find the predic
 	\text{WPM of Text}                & = \frac{\text{Total minutes to type text}}{\text{\# words in text}}
 \end{align*}
 
-To test the accuracy of my prediction function on entire texts, I applied the above formula to predict the WPM of all texts that I typed in TypeRacer with 100\% accuracy (the texts need to have 100\% accuracy as I didn't take accuracy into account when designing the machine learning model, so it wouldn't take into account races where I type a word slow because I typed it wrong the first time):
+To test the accuracy of my prediction function on entire texts, I applied the above formula to predict the WPM of all texts that I typed in TypeRacer with 100\% accuracy (the texts need to have 100\% accuracy as I didn't take accuracy into account when designing the machine learning model):
 
 \begin{figure}[H]
-	\caption{The predicted WPM using my prediction function $f$ compared with the actual WPM of the races}
+	\caption{The predicted WPM using my prediction function $f$ compared with the actual WPM of the races.}
 	\includegraphics[width=\textwidth]{predicted-vs-actual-wpm.png}
 \end{figure}
 
@@ -821,7 +821,7 @@ While there is a lot of variation in the graph, the WPM predictions do tend to i
 
 \section*{Conclusion}
 
-In conclusion, I was able to successfully create a machine learning algorithm that correlated certain text features with making the text easier to type and certain text features with making the text harder to type. While the machine learning algorithm wasn't the most accurate with its predictions (i.e. there was a lot of variation), its predictions did manage to follow the general trend: on average, as the actual WPM ratios increased, the predicted WPM ratios increased as well.
+In conclusion, I was able to successfully create a machine learning algorithm that correlated certain text features with making the text easier to type and certain text features with making the text harder to type. While the machine learning algorithm wasn't the most accurate with its predictions (i.e. there was a lot of deviations), its predictions did manage to follow the general trend: on average, as the actual WPM ratios increased, the predicted WPM ratios increased as well.
 
 Even though I would consider my machine learning model generally successful, there is still much room for improvement. There are many more features affecting the typing speed of words that I didn't get to analyze in this exploration, such as the impact of words involving alternating hands and ``finger rolls'' that involve pressing a series of adjacent keys with different fingers in quick succession. In addition, many of these features aren't necessarily linearly correlated, which would change my prediction function $f$ and my cost function $C$. However, even with these changes, I would still be able to apply gradient descent to these new functions as long as I can calculate the derivative of these non-linear correlations.
 

@@ -191,10 +191,10 @@ def plot_line(weights):
 
     plt.scatter(range(num_words), predictions, color="orange", s=1, label='Predicted WPM Ratio')
     plt.scatter(range(num_words), targets, color="green", s=1, label='Actual WPM Ratio')
-    plt.xlabel("Text Number")
-    plt.ylabel("WPM Ratio")
-    plt.title("Text Number vs. WPM Ratio")
-    plt.legend()
+    plt.xlabel("Text Number", size='20')
+    plt.ylabel("WPM Ratio", size='20')
+    plt.title("Text Number vs. WPM Ratio", size='20')
+    plt.legend(prop={'size': 16})
     plt.show()
 
 

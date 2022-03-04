@@ -11,7 +11,6 @@ export type WordFeatures = {
 	numDoubleLetters: number;
 	numHomeRowLetters: number;
 	numLeftHandLetters: number;
-	numNumbers: number;
 	numRightHandLetters: number;
 	numShiftedLetters: number;
 	wordLength: number;

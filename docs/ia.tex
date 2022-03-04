@@ -37,7 +37,7 @@ One of my hobbies is competitive typing, where I compete with my friends to type
 
 Your score at the end of the race is a measurement of your average typing speed throughout the text. Typing speed is measured in the units ``words per minute'' (``WPM'' for short), where each ``word'' is defined as five characters.
 
-However, not all texts are created equal. Some texts are harder to type than others, whether it's from having longer words, frequent capital letters, numbers, etc.
+However, not all texts are created equal. Some texts are harder to type than others, whether it's from having longer words, frequent capital letters, etc.
 
 In TypeRacer, your average typing speed from the last 10 rounds you've played determines the types of texts you'll be presented with: a lower average typing speed gives you easier texts, while a higher average typing speed gives you more difficult texts:
 
@@ -506,7 +506,6 @@ There are many characteristics of a word that can affect its WPM ratio. Below is
 	\item The number of letters in the home row of the keyboard (on a QWERTY keyboard, this is the row with the letters ``asdf'').
 	\item The number of letters typed with the left hand.
 	\item The number of letters typed with the right hand.
-	\item The number of numbers in the word.
 	\item The number of letters that require pressing the ``Shift'' key to type.
 	\item Whether the word is common (1 if the word is included within the top 1000 most common English words, and 0 otherwise).
 \end{itemize}
@@ -515,11 +514,11 @@ I've created a program that extracts these features from every word. Table 3 con
 
 % \begin{noindent}
 \begin{pycode}
-word1 = {"word":"profession ","medianWpm":154.134295227525,"isWordCommon":0,"numCapitalLetters":0,"numConsecutiveFingers":1,"numDoubleLetters":1,"numHomeRowLetters":7,"numLeftHandLetters":5,"numNumbers":0,"numRightHandLetters":5,"numShiftedLetters":0,"wordLength":11}
+word1 = {"word":"profession ","medianWpm":154.134295227525,"isWordCommon":0,"numCapitalLetters":0,"numConsecutiveFingers":1,"numDoubleLetters":1,"numHomeRowLetters":7,"numLeftHandLetters":5,"numRightHandLetters":5,"numShiftedLetters":0,"wordLength":11}
 
-word2 = {"word":"Table, ","medianWpm":136.84411614875188,"isWordCommon":1,"numCapitalLetters":1,"numConsecutiveFingers":0,"numDoubleLetters":0,"numHomeRowLetters":2,"numLeftHandLetters":3,"numNumbers":0,"numRightHandLetters":3,"numShiftedLetters":1,"wordLength":7}
+word2 = {"word":"Table, ","medianWpm":136.84411614875188,"isWordCommon":1,"numCapitalLetters":1,"numConsecutiveFingers":0,"numDoubleLetters":0,"numHomeRowLetters":2,"numLeftHandLetters":3,"numRightHandLetters":3,"numShiftedLetters":1,"wordLength":7}
 
-word3 = {"word":"1950s, ","medianWpm":81.3953488372093,"isWordCommon":0,"numCapitalLetters":0,"numConsecutiveFingers":0,"numDoubleLetters":0,"numHomeRowLetters":1,"numLeftHandLetters":4,"numNumbers":4,"numRightHandLetters":2,"numShiftedLetters":4,"wordLength":7}
+word3 = {"word":"1950s, ","medianWpm":81.3953488372093,"isWordCommon":0,"numCapitalLetters":0,"numConsecutiveFingers":0,"numDoubleLetters":0,"numHomeRowLetters":1,"numLeftHandLetters":4,"numRightHandLetters":2,"numShiftedLetters":4,"wordLength":7}
 
 def get_table_1_row(w):
 	return Rf"""
@@ -538,7 +537,6 @@ def get_table_2_row(w):
 		"{w['word']}" &
 		{w['numLeftHandLetters']} &
 		{w['numRightHandLetters']} &
-		{w['numNumbers']} &
 		{w['numShiftedLetters']} &
 		{w['isWordCommon']} &
 		{"%.2f" % w['medianWpm']}
@@ -587,7 +585,6 @@ def get_table_2_row(w):
 		Word                          &
 		\# of Left Hand Letters       &
 		\# of Right Hand Letters      &
-		\# of Numbers                 &
 		\# of Letters Requiring Shift &
 		Is word common?               &
 		Median WPM
@@ -720,17 +717,16 @@ Not only do vectors allow us to represent our equations more succinctly, but the
 % \begin{noindent}
 \begin{pycode}
 final_weights = [
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
+	-0.07200872660362857, # word_length
+	-0.0028186947204240816, # num_capital_letters
+	-0.0887768900289833, # num_consecutive_fingers
+	0.028094111732003876, # num_double_letters
+	0.0012641055456548735, # num_home_row_letters
+	0.05252760479202044, # num_left_hand_letters
+	0.07245468464334391, # num_right_hand_letters
+	-0.18397703898381226, # num_shifted_letters
+	0.07311495969371014, # is_word_common
+	1.252027666643374 # bias
 ]
 \end{pycode}
 % \end{noindent}
@@ -758,18 +754,24 @@ Using the above vector equations, I've implemented a Python program that process
 	w_{\text{\# of right hand letters}}
 	 & = \py{final_weights[6]}
 	\\
-	w_{\text{\# of numbers}}
+	w_{\text{\# of letters requiring shift}}
 	 & = \py{final_weights[7]}
 	\\
-	w_{\text{\# of letters requiring shift}}
-	 & = \py{final_weights[8]}
-	\\
 	w_{\text{is word common}}
-	 & =\py{final_weights[9]}
+	 & =\py{final_weights[8]}
 	\\
 	b
-	 & = \py{final_weights[10]}
+	 & = \py{final_weights[9]}
 \end{align*}
+
+To see how accurate my predictions were visually, I plotted a point for each text: one point that represented the predicted WPM Ratio from my equation and one point that represented the actual WPM Ratio for that text. When plotting this graph, I sorted all the texts by their WPM Ratio so that it's easier to see how my prediction function compares against the actual values:
+
+\begin{figure}[H]
+	\caption{A graph of text number vs. WPM Ratio with the orange dots representing predictions from my prediction function and the green dots representing the actual WPM Ratio values of a word.}
+	\includegraphics[width=\textwidth]{predictions.png}
+\end{figure}
+
+
 
 
 \section*{Appendix}

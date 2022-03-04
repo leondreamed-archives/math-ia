@@ -134,7 +134,6 @@ def parse_words(word_stats):
         num_double_letters = word["numDoubleLetters"]
         num_home_row_letters = word["numHomeRowLetters"]
         num_left_hand_letters = word["numLeftHandLetters"]
-        num_numbers = word["numNumbers"]
         num_right_hand_letters = word["numRightHandLetters"]
         num_shifted_letters = word["numShiftedLetters"]
         word_length = word["wordLength"]
@@ -147,7 +146,6 @@ def parse_words(word_stats):
             num_double_letters,
             num_home_row_letters,
             num_left_hand_letters,
-            num_numbers,
             num_right_hand_letters,
             num_shifted_letters,
             word_length,
@@ -157,7 +155,18 @@ def parse_words(word_stats):
 
         features_of_words.append(features_of_word)
 
-    weights = [0.07311495969483332, -0.0028186947235569818, -0.08877689002860091, 0.028094111731677158, 0.0012641055456418648, 0.052527604782829265, 0.0, 0.07245468463395333, -0.1839770389811332, -0.07200872659410296, 1.252027666632455]
+    weights = [
+        0.07311495969371014,
+        -0.0028186947204240816,
+        -0.0887768900289833,
+        0.028094111732003876,
+        0.0012641055456548735,
+        0.05252760479202044,
+        0.07245468464334391,
+        -0.18397703898381226,
+        -0.07200872660362857,
+        1.252027666643374,
+    ]
 
     return targets, features_of_words, weights
 
@@ -174,17 +183,23 @@ def plot_loss_function():
     plt.plot(range(len(losses)), losses)
     plt.show()
 
+
 def plot_line(weights):
     print(weights)
     num_words = len(features_of_words)
     predictions = predict(features_of_words, weights)
 
-    plt.scatter(range(num_words), predictions, color="orange", s=1)
-    plt.scatter(range(num_words), targets, color="green", s=1)
+    plt.scatter(range(num_words), predictions, color="orange", s=1, label='Predicted WPM Ratio')
+    plt.scatter(range(num_words), targets, color="green", s=1, label='Actual WPM Ratio')
+    plt.xlabel("Text Number")
+    plt.ylabel("WPM Ratio")
+    plt.title("Text Number vs. WPM Ratio")
+    plt.legend()
     plt.show()
 
-final_weights = train(weights, features_of_words, targets)
-print("final: ", final_weights)
+
+# final_weights = train(weights, features_of_words, targets)
+print("final: ", weights)
 
 # plot_loss_function()
-# plot_line(final_weights)
+plot_line(weights)

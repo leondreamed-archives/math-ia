@@ -6,6 +6,10 @@ const wordStats = JSON.parse(
 	fs.readFileSync(getWordStatsFilePath()).toString()
 ) as WordStats[];
 
+for (const word of wordStats) {
+	if (/\d/.test(word.word)) console.log(word.word)
+}
+
 console.log(wordStats.length);
 const bounds = {
 	5: [1.9, 2.4],

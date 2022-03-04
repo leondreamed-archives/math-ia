@@ -214,7 +214,6 @@ def f3f(number):
 
 For a linear prediction function $f(\text{Word}_i) = w_1x_1 + b$, the cost function can be represented graphically as the sum of the squared lengths of the red lines in the graphs below:
 
-% TODO
 \begin{figure}[H]
 	\centering
 	\caption{A graph of the values in Figure 4 with a suboptimal line of best fit where the red lines between this line and the actual data points represent the cost. The goal of our function is to minimize the sum of the squared lengths of these red lines.}
@@ -452,9 +451,10 @@ For example, if we set $\eta$ equal to \py{learning_rate}, then the new values f
 \end{center}
 }
 
+One limitation with gradient descent is that by using gradient descent, it's possible for the machine learning model to converge at a local minimum for the cost function instead of arriving at the global minimum. However, in practice, the local minimum of complex cost functions are generally close to the global minimum, which is why gradient descent remains a popular method to minimizing the cost function in machine learning models.
+
 However, how do we know what value of $\eta$ we should use? In other words, how much should increase or decrease $w_1$ by? If we increase/decrease the weight by too much, we could end up in a position of higher loss than we were before. If we move increase/decrease the weight too slowly, it will take a long time before we find the minimum:
 
-% TODO
 \begin{figure}[H]
 	\centering
 	\caption{Increasing by too much would overshoot the local minimum; increasing by too little would take too long to reach the local minimum.}
@@ -480,7 +480,7 @@ In my program, I've also tracked the value of the cost function $C(w_1, b)$ afte
 \begin{figure}[H]
 	\centering
 	\caption{A graph of iteration number versus cost when running the machine learning model with the values in Table \ref{table:word-lengths}. The cost initially decreases steeply, but overtime it decreases more slowly.}
-	\includegraphics{iteration-no-vs-cost.png}
+	\includegraphics[width=\textwidth]{iteration-no-vs-cost.png}
 \end{figure}
 
 However, as indicated by the graph in Table 3, the WPM ratio isn't just correlated with the word length. Thus, we need to apply our machine learning algorithms for a prediction function that takes into account more features in addition to the word length.

@@ -37,11 +37,11 @@ One of my hobbies is competitive typing, where I compete with my friends to type
 	\caption{A screenshot of a typing competition on the website \textit{TypeRacer}}
 \end{figure}
 
-Your score at the end of the race is a measurement of your average typing speed throughout the text. Typing speed is measured in the units ``words per minute'' (``WPM'' for short), where each ``word'' is defined as five characters.
+Your score at the end of the race is a measurement of your average typing speed throughout the text. Typing speed is measured in the units ``words per minute'' (``WPM'' for short), where each ``word'' is defined as five characters, including spaces.
 
 However, not all texts are created equal. Some texts are harder to type than others, whether it's from having longer words, frequent capital letters, etc.
 
-In TypeRacer, your average typing speed from the last 10 rounds you've played determines the types of texts you'll be presented with: a lower average typing speed gives you easier texts, while a higher average typing speed gives you more difficult texts:
+In TypeRacer, your average score (typing speed) from the last 10 rounds you've played determines the types of texts you'll be presented with. A lower average typing speed causes you to encounter easier texts, while a higher average typing speed gives you more difficult texts:
 
 \begin{figure}[H]
 	\caption{Two different possible texts in TypeRacer. On the left, an easy text, and on the right, a more difficult text.}
@@ -49,28 +49,17 @@ In TypeRacer, your average typing speed from the last 10 rounds you've played de
 	\includegraphics[width=0.5\textwidth]{hard-text.png}
 \end{figure}
 
-Currently, the way TypeRacer determines the difficulty of a text is through data collected from random players typing the text. If, on average, the players' speed on the text is slower than their average speed overall, then the text is classified as more difficult. If the players' speed on the text is faster than their speed overall, then the text is classified as less difficult.
+Currently, the way TypeRacer determines the difficulty of a text is through data collected from random players typing the text. If, on average, the players' speed on the text is lower than their average speed overall on other texts, then the text is classified as more difficult. If the players' speed on the text is greater than their overall speed, then the text is classified as easier to type.
 
-While this approach works fore TypeRacer, there are other scenarios where it would be better to predict a text's difficulty without needing to collect data from users to accurately determine the text's difficulty. For example, other typing sites may not have as large of a user base as TypeRacer, and they may need to manually classify the difficulty of various texts. In addition, the text difficulty that is calculated by TypeRacer is an average of the performance of all TypeRacer players, which is biased towards the QWERTY keyboard layout since that's the most common layout. However, I don't use the QWERTY layout, but rather a modification of the less-popular Dvorak layout called Programmer Dvorak (see Appendix). Thus, a word that may be difficult for QWERTY users to type (e.g. \texttt{minimum}) might be easier for me because my keys are arranged differently.
+While this approach works well for TypeRacer, there are other scenarios where it would be better to predict a text's difficulty without needing to collect data from users to accurately determine how difficult a text is to type. For example, other typing sites may not have as large of a user base as TypeRacer, and they may need to manually classify the difficulty of various texts, which can be time-consuming. In addition, the text difficulty calculated by TypeRacer is an average of the performance of all TypeRacer players. This is a problem because it is biased towards users of the QWERTY keyboard layout, since that's the most popular keyboard layout. However, I don't use the QWERTY layout, but rather a modification of the less-popular Dvorak layout called Programmer Dvorak (refer to Figure \ref{fig:programmer-dvorak} in the Appendix for an image of the layout). Thus, a word that may be difficult for QWERTY users to type (e.g. \texttt{minimum}) might be easier for me because my keys are arranged differently.
 
-At first glance, it might seem that the difficulty of a text is correlated with its text length. However, this approach isn't flawless. Consider the following two texts that can appear on TypeRacer:
-
-\begin{textexamples}
-	\textbf{Text 1}: Supercalifragilisticexpialidocious is Vielle's favorite word to type on TypeRacer.
-	\textbf{Text 2}: For someone who was never meant for this world, I must confess I'm suddenly having a hard time leaving it.
-\end{textexamples}
-
-Even though Text 1 has fewer characters than Text 2, it is still considerably more difficult to type because of the complex first word. This indicates that a text's difficulty is determined by many other factors than just the text length, like the amount of capital letters in the text, the average word length in the text, etc.
-
-My goal in this exploration is to create a program that takes a certain text as input and outputs a prediction of how fast I would the text based on various characteristics of the text. This program will use machine learning, which involves the use of algorithms and statistical models to analyze and detect patterns in data. But, in order to apply machine learning, I first need to collect data that would be analyzed by machine learning.
+Thus, my goal in this exploration is to create a program that takes a certain text as input and outputs a prediction of how fast I would type the text by analyzing various characteristics of the text and correlating them with typing speed by using my performance on past races. This program will use machine learning, which involves the use of algorithms and statistical models to analyze and detect patterns in data. But, in order to apply machine learning, I first need to collect data that would be analyzed by machine learning.
 
 \section*{Gathering Data}
 
-In order to create a machine learning algorithm that predicts how fast I can type a certain text based on the text features, we need to collect a large amount of data that includes various texts and the speed at which I type them. Luckily, I've been using TypeRacer for over 5 years now, and over these 5 years I've typed over 8000 texts on my account.
+In order to create a machine learning algorithm that predicts how fast I can type a certain text based on the text features, we need to collect a large amount of data that includes various texts and the speed at which I type them. Luckily, I've been active on TypeRacer for over 5 years now, and over these 5 years I've typed over 8000 texts on my account.
 
-I created a program that automatically scrapes the race data from all my 8000 races and saves them into a file.
-
-% TODO: Why WPM Ratio?
+I created a program that automatically scrapes the race data from each of my 8000+ texts. Since TypeRacer doesn't have an official way to collect this data, I had to use web scraping that retrieved the entire web page for each of my 8000+ races. Each web page contained a typing log that included the exact time I pressed each keystroke, which is crucial so that I can measure the typing speed of each individual word. With the data collected, it was now time to analyze the data.
 
 \section*{Analyzing Data}
 
@@ -468,7 +457,7 @@ However, how do we know what value of $\eta$ we should use? In other words, how 
 \begin{figure}[H]
 	\centering
 	\caption{TODO: Increasing by too much would overshoot the local minimum; increasing by too little would take too long to reach the local minimum.}
-	\includegraphics{todo.png}
+	\includegraphics[width=\linewidth]{todo.png}
 \end{figure}
 
 The optimal choice of $\eta$ will vary for different situations, but there are heuristics that can help. When the learning rate is too high, the cost function will increase infinitely, so whenever it happens in practice you would decrease the learning rate by an order of magnitude.
@@ -794,6 +783,7 @@ In addition, for my prediction algorithm, I assumed that all the features were l
 \begin{figure}[H]
 	\caption{The Programmer Dvorak Keyboard Layout}
 	\includegraphics[width=\textwidth]{programmer-dvorak.png}
+	\label{fig:programmer-dvorak}
 \end{figure}
 
 \subsection*{Python Code}

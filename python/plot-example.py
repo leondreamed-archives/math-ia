@@ -14,8 +14,8 @@ y_values = [data[2] for data in word_data]
 
 plt.scatter(x_values, y_values)
 
-w_1 = -0.105086863
-b = 2.472476099
+w_1 = -0.2
+b = 3.2
 
 plt.plot(x_values, [x_value * w_1 + b for x_value in x_values])
 plt.scatter(x_values, y_values)

@@ -193,6 +193,7 @@ def f3f(number):
 % \end{noindent}
 
 \begin{table}[H]
+	\label{table:word-lengths}
 	\caption{The word length and WPM ratio for a small selection of words.}
 	\noindent\begin{tabularx}{\linewidth}{|X|X|X|}
 		\hline
@@ -216,8 +217,8 @@ For a linear prediction function $f(\text{Word}_i) = w_1x_1 + b$, the cost funct
 % TODO
 \begin{figure}[H]
 	\centering
-	\caption{TODO: A graph of the values in Figure 4, where the blue lines between the line of best fit and the actual data points represent the cost.}
-	\includegraphics[width=\linewidth]{todo.png}
+	\caption{A graph of the values in Figure 4 with a suboptimal line of best fit where the red lines between this line and the actual data points represent the cost. The goal of our function is to minimize the sum of the squared lengths of these red lines.}
+	\includegraphics[width=\linewidth]{cost-visualization.png}
 \end{figure}
 
 The goal of our machine learning algorithm is to minimize the cost function: to find a set of weights for our prediction function $f$ such that $C(f)$ is as low as possible. A popular method for minimizing cost is by using gradient descent.
@@ -477,10 +478,9 @@ If we substitute these values for $w_1$ and $b$ into our prediction function $f$
 
 In my program, I've also tracked the value of the cost function $C(w_1, b)$ after each iteration. Plotting the cost against the iteration number gives us the following graph:
 \begin{figure}[H]
-	% TODO
 	\centering
-	\caption{TODO: A graph of cost versus iteration number.}
-	\includegraphics{todo.png}
+	\caption{A graph of iteration number versus cost when running the machine learning model with the values in Table \ref{table:word-lengths}. The cost initially decreases steeply, but overtime it decreases more slowly.}
+	\includegraphics{iteration-no-vs-cost.png}
 \end{figure}
 
 However, as indicated by the graph in Table 3, the WPM ratio isn't just correlated with the word length. Thus, we need to apply our machine learning algorithms for a prediction function that takes into account more features in addition to the word length.

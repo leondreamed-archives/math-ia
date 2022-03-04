@@ -113,16 +113,12 @@ targets = [
 def plot_loss_function():
 	losses = [cost_function(features_of_words, targets, weights) for weights in weights_history]
 	plt.plot(range(len(losses)), losses)
+	plt.title("Iteration Number vs. Cost", size=20)
+	plt.xlabel("Iteration Number", size=20)
+	plt.ylabel("Cost", size=20)
 	plt.show()
 
-# plt.plot(weights, cost_y)
-# plt.plot(weights, cost_dy, color='red')
-
-# plt.title("Weight vs. Cost")
-# plt.xlabel("Weight")
-# plt.ylabel("Cost")
-
-# plt.show()
+plt.show()
 
 def plot_line(weights):
 	print(weights)
@@ -137,6 +133,9 @@ def plot_line(weights):
 	plt.show()
 
 final_weights = train(weights, features_of_words, targets)
+
+plot_loss_function()
+
 
 print("final: ", final_weights)
 

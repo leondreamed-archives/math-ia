@@ -58,7 +58,7 @@ Thus, my goal in this exploration is to create a program that takes a certain te
 
 In order to create a machine learning algorithm that predicts how fast I can type a certain text, I need to collect a large amount of data that includes various texts and the speed at which I type them. Luckily, I've been active on TypeRacer for over 5 years now, and over these 5 years I've typed over 8000 texts on my account.
 
-I created a program that automatically scrapes the race data from each of the 8000+ texts I've typed. I decided that for the scope of this exploration, I will only be using words that I've typed with 100\% accuracy (in other words, without making any mistakes). This is because accuracy is a fairly random measurement: just because I typed a word inaccurately once doesn't mean that the word is necessarily harder to type—it might have just been bad luck. After filtered out all the words that I didn't type perfectly, I was left with 20454 unique words to analyze.
+I created a program that automatically scrapes the race data from each of the 8000+ texts I've typed. I decided that for the scope of this exploration, I will only be using words that I've typed with 100\% accuracy (in other words, without making any mracesistakes). This is because accuracy is a fairly random measurement: just because I typed a word inaccurately once doesn't mean that the word is necessarily harder to type—it might have just been bad luck. After filtered out all the words that I didn't type perfectly, I was left with 20454 unique words to analyze.
 
 \section*{Analyzing Data}
 
@@ -80,7 +80,7 @@ For example, if the typing speed of a word was only linearly proportional to its
 
 This equation resembles the typical linear equation $y = mx + b$, where $w_{\text{word length}}$ represents the slope, or in other words, the amount that the WPM Ratio increases or decreases by when the word length is increased by 1.
 
-However, when we plot the graph of word length against WPM Ratio, we obtain the following graph:
+However, when we plot a scatterplot of word length against WPM Ratio for our 20454, we obtain the following graph:
 
 \begin{figure}[H]
 	\caption{A graph of word length vs. WPM Ratio; each blue point represents a unique word collected from my TypeRacer typing data.}
@@ -162,7 +162,7 @@ To create an accurate prediction function, we need to find optimal values of $w_
 
 The cost function will give us a way to measure how accurate our prediction function $f$ is, and more importantly, how we can adjust the weights $w_f$ in our prediction function in order to reduce the cost.
 
-One popular cost function used in machine learning is the MSE (Mean Squared Error). This function defines the cost as the squares of the difference between the actual data ($y_i$) and the predicted data ($f(\text{Word}_i)$):
+One popular cost function used in machine learning is the MSE (Mean Squared Error). The MSE function defines the cost as the squares of the differences between the actual data ($y_i$) and the predicted data ($f(\text{Word}_i)$):
 \begin{align*}
 	C(f) & = \frac{1}{N}\big[(y_1 - f(\text{Word}_1))^2 + (y_2 - f(\text{Word}_2))^2 + \dots + (y_n - f(\text{Word}_n))^2]
 	\\
@@ -217,7 +217,7 @@ For a linear prediction function $f(\text{Word}_i) = w_1x_1 + b$, the cost funct
 
 \begin{figure}[H]
 	\centering
-	\caption{A graph of the values in Table 2 with a suboptimal line of best fit where the red lines between this line and the actual data points represent the cost. The goal of our function is to minimize the sum of the squared lengths of these red lines.}
+	\caption{A graph of the values in Table 2 with a suboptimal line of best fit. The red dots represent the actual data points and the red lines between these data points and the suboptimal line of best fit represent the cost. The goal of our function is to minimize the sum of the squared lengths of these red lines.}
 	\includegraphics[width=\linewidth]{cost-visualization.png}
 \end{figure}
 
@@ -253,7 +253,7 @@ def get_geogebra_equation():
 \end{pycode}
 % \end{noindent}
 
-To visualize this cost function, we can use a 3D graph where the x-axis correlates with various values of $w_1$, the z-axis correlates with various values of $b$, and the y-axis represents the cost (the value of $C(w_1, b)$). Using the values from Table 2 for our values of $x_i$ and $y_i$, a visual representation of our cost function would look like the following graph:
+To visualize this cost function, we can use a 3D graph where the x-axis correlates with various values of $w_1$, the y-axis correlates with various values of $b$, and the z-axis represents the cost (the value of $C(w_1, b)$). Using the values from Table 2 for our values of $x_i$ and $y_i$, a visual representation of our cost function would look like the following graph:
 \begin{figure}[H]
 	\centering
 	\caption{A 3D visualization of our cost function plotted with GeoGebra using the equation $\py{get_geogebra_equation()}$. The red x-axis represents various values for $w_1$, the green y-axis represents various values for $b$, and the blue z-axis represents the cost $C(w_1, b)$.}
@@ -264,7 +264,7 @@ The goal of our machine learning algorithm is to find the minimum on the graph o
 
 \subsection*{Partial Derivatives}
 
-For a function that takes multiple variables, the gradient of the function is a vector where the $i$th value in the vector is the partial derivative of our function with respect to variable $i$. For our cost function, this means that the gradient, $\nabla Q$, is equal to:
+For a function that takes multiple variables, the gradient of the function is a vector where the $i$th value in the vector is the partial derivative of our function with respect to variable $i$. For our cost function $C(w_1, b)$, this means that the gradient, $\nabla Q$, is equal to:
 \begin{align*}
 	\nabla Q = \Big(\frac{dC}{dw_1}, \frac{dC}{db}\Big)
 \end{align*}
@@ -344,7 +344,7 @@ Each partial derivative with respect to a variable tells us how the cost functio
 	\frac{dC}{dw_1} & = \py{cost_derivative_str}
 \end{align*}
 
-Because the value of $\frac{dC}{dw_1}$ is positive, it indicates that increasing $w_1$ and keeping $b$ constant would increase the value of our cost function $C(w_1, b)$. This means that our current value of $w_1$ is greater than the optimal value of $w_1$, and to minimize our cost function, we need we should decrease $w_1$.
+Because the value of $\frac{dC}{dw_1}$ is positive, it indicates that increasing $w_1$ and keeping $b$ constant would increase the value of our cost function $C(w_1, b)$. This means that our current value of $w_1$ is greater than the optimal value of $w_1$, and to minimize our cost function, we should decrease $w_1$.
 
 % \begin{noindent}
 \begin{pycode}
@@ -374,7 +374,7 @@ cost_derivative_bias_str = "%.2f" % get_cost_derivative_bias()
 \end{pycode}
 % \end{noindent}
 
-This process is repeated for each partial derivative. For example, with our current bias value $b = \py{bias}$, the partial derivative $\frac{dC}{db}$ is equal to:
+This process is repeated for each partial derivative. For example, if our current bias value is $b = \py{bias}$, the partial derivative $\frac{dC}{db}$ is equal to:
 \begin{align*}
 	\frac{dC}{db} & = -\frac{2}{N} \sum_{i=1}^{n} (y_i - (\py{weight})x_i - (\py{bias}))
 	\\
@@ -464,10 +464,10 @@ However, how do we know what value of $\eta$ we should use? In other words, how 
 
 The optimal choice of $\eta$ will vary for different situations, but there are heuristics that can help. When the learning rate is too high, the cost function will increase infinitely, indicating that the learning rate should be decreased by an order of magnitude. In my case, I simply monitored the cost after each iteration and used trial-and-error to find an optimal learning rate.
 
-I created a Python program to run the above calculations for the values in Table 2 until the difference between $C(w_1, b)$ and $C(w_1', b')$ was less than $10^-9$, indicating that the machine learning model had converged. I set the learning rate $\eta$ to 0.01, and after 8341 iterations, the program outputted the following values for $w_1$ and $b$ (to 9 decimal places):
+I created a Python program to run the above calculations for the values in Table 2 until the difference between $C(w_1, b)$ and $C(w_1', b')$ was less than $10^{-9}$, indicating that the machine learning model had converged. I set the learning rate $\eta$ to 0.01, and after 8341 iterations, the program outputted the following values for $w_1$ and $b$ (to 9 decimal places):
 \begin{align}
-	w_1 = -0.105086863 \\
-	b = 2.472476099
+	w_1 & = -0.105086863 \\
+	b   & = 2.472476099
 \end{align}
 
 If we substitute these values for $w_1$ and $b$ into our prediction function $f$ and plot our function on a graph alongside the data from Table 2, we obtain the following graph:
@@ -488,17 +488,17 @@ However, as indicated by the graph in Figure 3, the WPM ratio isn't just correla
 
 \subsection*{Analyzing More Features}
 
-There are many characteristics of a word that can affect its WPM ratio. Below is a list of features that I will be analyzing and using in creating an accurate prediction function for predicting the WPM ratio of a word:
+There are many characteristics of a word that can affect its WPM ratio. Below is a list of features that I will be analyzing and using to create an accurate prediction function for predicting the WPM ratio of a word:
 
 \begin{itemize}
 	\item The number of characters in the word (word length).
 	\item The number of capital letters in the word.
-	\item The amount of times the same finger is used to type consecutive letters in the word. For example, the word ``mummy'' requires using the right index finger five times in a row on a QWERTY keyboard.
-	\item The number of sets of ``double letters'' in the word. For example, the word ``sheep'' has 1 set of double letters, and the word ``bittersweet'' has two sets of double letters.
+	\item The number of times the same finger is used to type consecutive letters in the word. For example, the word ``mummy'' requires using the right index finger five times in a row on a QWERTY keyboard.
+	\item The number of sets of ``double letters'' in the word. For example, the word ``sheep'' has 1 set of double letters, and the word ``bittersweet'' has 2 sets of double letters.
 	\item The number of letters in the home row of the keyboard (on a QWERTY keyboard, this is the row with the letters ``asdf'').
 	\item The number of letters typed with the left hand.
 	\item The number of letters typed with the right hand.
-	\item The number of letters that require pressing the ``Shift'' key to type.
+	\item The number of letters that require pressing the Shift key to type.
 	\item Whether the word is common (1 if the word is included within the top 1000 most common English words, and 0 otherwise).
 \end{itemize}
 
@@ -538,7 +538,7 @@ def get_table_2_row(w):
 
 \begin{table}[H]
 	\def\arraystretch{1.3}
-	\caption{Three examples of features in words.  The following data might not match with the data expected from a QWERTY layout, and that's because when analyzing my typing data, I based it off the keyboard layout that I use—the Programmer Dvorak layout (please refer to Figure 12 in the Appendix)}
+	\caption{Three examples of features in words.  The following data might not match with the data expected from a QWERTY layout, and that's because when analyzing my typing data, I based it off the keyboard layout that I use—the Programmer Dvorak layout (refer to Figure 12 in the Appendix for more information).}
 	\begin{tabularx}{\linewidth}{|
 			p{70pt}|
 			>{\RaggedRight}X|
@@ -593,39 +593,39 @@ def get_table_2_row(w):
 
 To incorporate all these features into our prediction function, we need to include more terms in our equation. If we define $w_f$ to represent the weight of feature $f$ and the value of feature $f$ of word $i$ as ${x_f}_i$, then our new prediction function would look like:
 \begin{align*}
-	f(\text{Word}_i) & = w_1{x_1}_i + w_2{x_2}_i + \dots + w_{10}{x_{10}}_i + b
+	f(\text{Word}_i) & = w_1{x_1}_i + w_2{x_2}_i + \dots + w_{9}{x_{9}}_i + b
 	\\
-	f(\text{Word}_i) & = \Big(\sum_{f=1}^{10} w_f{x_f}_i\Big) + b
+	f(\text{Word}_i) & = \Big(\sum_{f=1}^{9} w_f{x_f}_i\Big) + b
 \end{align*}
 
 Our cost function would also change:
 \begin{align*}
-	C(f)                          & = \frac{1}{10} \sum_{i=1}^{10} (y_i - f(\text{Word}_i))^2
+	C(f)                          & = \frac{1}{9} \sum_{i=1}^{9} (y_i - f(\text{Word}_i))^2
 	\\
-	C(w_1, w_2, \dots, w_{10}, b) & = \frac{1}{10} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{10}{x_{10}} - b)
+	C(w_1, w_2, \dots, w_{9}, b) & = \frac{1}{9} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{9}{x_{9}} - b)
 \end{align*}
 
 The new gradient $\nabla Q$ for our cost function would now be:
 \begin{align*}
-	\nabla Q & = \Big(\frac{dC}{dw_1}, \frac{dC}{dw_2}, \dots, \frac{dC}{dw_{10}}, \frac{dC}{db}\Big)
+	\nabla Q & = \Big(\frac{dC}{dw_1}, \frac{dC}{dw_2}, \dots, \frac{dC}{dw_{9}}, \frac{dC}{db}\Big)
 	\\
 	\nabla Q & =
 	\begin{aligned}[t]
 		\Big(
-		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{10}{x_{10}}_i - b) \times {x_1}_i,
+		 & -\frac{2}{9} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{9}{x_{9}}_i - b) \times {x_1}_i,
 		\\
-		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{10}{x_{10}}_i - b) \times {x_2}_i,
+		 & -\frac{2}{9} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{9}{x_{9}}_i - b) \times {x_2}_i,
 		\\
 		 & \vdots
 		\\
-		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{10}{x_{10}}_i - b) \times {x_{10}}_i,
+		 & -\frac{2}{9} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{9}{x_{9}}_i - b) \times {x_{9}}_i,
 		\\
-		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{10}{x_{10}}_i - b)
+		 & -\frac{2}{9} \sum_{i=1}^{n} (y_i - w_1{x_1}_i - w_2{x_2}_i - \dots - w_{9}{x_{9}}_i - b)
 		\Big)
 	\end{aligned}
 \end{align*}
 
-After each iteration, we need to update all 10 weights:
+After each iteration, we need to update all 9 weights:
 \begin{align*}
 	w_1' & = w_1 - \frac{dC}{dw_1} \times \eta,
 	\;
@@ -633,28 +633,28 @@ After each iteration, we need to update all 10 weights:
 	\;
 	\dots,
 	\;
-	w_{10}' = w_{10} - \frac{dC}{dw_{10}} \times \eta
+	w_{9}' = w_{9} - \frac{dC}{dw_{9}} \times \eta
 	\\
 	b'   & = b - \frac{dC}{db} \times \eta
 \end{align*}
 
 The above equations involve many separate variables, which makes implementing the algorithm with code more difficult. Luckily, we can simplify the above equations using vectors.
 
-Let us denote $\vec{X_i}$ as a vector whose length is 10, which is equal to the number of features in each word. $\vec{X_i}$ contains all the values of the features of $\text{Word}_i$. Let us denote $\vec{W}$ as a vector also of length 10 containing all the weights for each feature. Using these vector definitions, we can use vectors to represent our prediction function:
+Let us denote $\vec{X_i}$ as a vector whose length is 9, which is equal to the number of features in each word. $\vec{X_i}$ contains all the values of the features of $\text{Word}_i$. Let us denote $\vec{W}$ as a vector also of length 9 containing all the weights for each feature. Using these vector definitions, we can use vectors to represent our prediction function:
 \begin{align*}
-	f(\text{Word}_i) & = \Big(\sum_{f=1}^{10} w_f{x_f}_i\Big) + b
+	f(\text{Word}_i) & = \Big(\sum_{f=1}^{9} w_f{x_f}_i\Big) + b
 	\\
 	f(\text{Word}_i) & = \vec{X_i} \cdot \vec{W} + b
 \end{align*}
 
 To further simplify this equation, we can define $\vec{X}_i$ as a vector of length 11 instead—1 greater than the number of features in each word. In addition to containing all the values of the features of $\text{Word}_i$, we add a constant 1 to the end of $\vec{X}_i$:
 \begin{align*}
-	\vec{X}_i = ({x_1}_i, {x_2}_i, \dots, {x_{10}}_i, 1)
+	\vec{X}_i = ({x_1}_i, {x_2}_i, \dots, {x_{9}}_i, 1)
 \end{align*}
 
 This way, if we redefined $\vec{W}$ to be a vector of length 11 which contains all the weights \textit{and} the bias term:
 \begin{align*}
-	\vec{W} = (w_1, w_2, \dots, w_{10}, b)
+	\vec{W} = (w_1, w_2, \dots, w_{9}, b)
 \end{align*}
 
 Our prediction function could then be written as:
@@ -664,9 +664,9 @@ Our prediction function could then be written as:
 
 Since this would be equal to:
 \begin{align*}
-	f(\text{Word}_i) & = w_1{x_i}_1 + w_2{x_i}_2 + \dots + w_{10}{x_i}_{10} + (1)(b)
+	f(\text{Word}_i) & = w_1{x_i}_1 + w_2{x_i}_2 + \dots + w_{9}{x_i}_{9} + (1)(b)
 	\\
-	f(\text{Word}_i) & = \Big(\sum_{f=1}^{10} w_f{x_f}_i\Big) + b
+	f(\text{Word}_i) & = \Big(\sum_{f=1}^{9} w_f{x_f}_i\Big) + b
 \end{align*}
 
 Which is equal to our initial prediction function.
@@ -675,27 +675,27 @@ Which is equal to our initial prediction function.
 
 Using vectors, we can also simplify our cost function:
 \begin{align*}
-	C(f)       & = \frac{1}{10} \sum_{i=1}^{10} (y_i - f(\text{Word}_i))^2
+	C(f)       & = \frac{1}{9} \sum_{i=1}^{9} (y_i - f(\text{Word}_i))^2
 	\\
-	C(\vec{W}) & = \frac{1}{10} \sum_{i=1}^{10} (y_i - \vec{W} \cdot \vec{X_i})^2
+	C(\vec{W}) & = \frac{1}{9} \sum_{i=1}^{9} (y_i - \vec{W} \cdot \vec{X_i})^2
 \end{align*}
 
 And finally, we can simplify our gradient $\nabla Q$:
 \begin{align*}
-	\nabla Q & = \Big(\frac{dC}{dw_1}, \frac{dC}{dw_2}, \dots, \frac{dC}{dw_{10}}, \frac{dC}{db}\Big)
+	\nabla Q & = \Big(\frac{dC}{dw_1}, \frac{dC}{dw_2}, \dots, \frac{dC}{dw_{9}}, \frac{dC}{db}\Big)
 	\\
 	\nabla Q & =
 	\begin{aligned}[t]
 		\Big(
-		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - \vec{W} \cdot \vec{X_i}) \times {x_i}_1,
+		 & -\frac{2}{9} \sum_{i=1}^{n} (y_i - \vec{W} \cdot \vec{X_i}) \times {x_i}_1,
 		\\
-		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - \vec{W} \cdot \vec{X_i}) \times {x_i}_2,
+		 & -\frac{2}{9} \sum_{i=1}^{n} (y_i - \vec{W} \cdot \vec{X_i}) \times {x_i}_2,
 		\\
 		 & \vdots
 		\\
-		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - \vec{W} \cdot \vec{X_i}) \times {x_i}_{10},
+		 & -\frac{2}{9} \sum_{i=1}^{n} (y_i - \vec{W} \cdot \vec{X_i}) \times {x_i}_{9},
 		\\
-		 & -\frac{2}{10} \sum_{i=1}^{n} (y_i - \vec{W} \cdot \vec{X_i})
+		 & -\frac{2}{9} \sum_{i=1}^{n} (y_i - \vec{W} \cdot \vec{X_i})
 		\Big)
 	\end{aligned}
 \end{align*}

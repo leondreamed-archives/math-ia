@@ -123,3 +123,4 @@ dist-ssr
 tsconfig.tsbuildinfo
 
 .latex-workflow
+.DS_Store

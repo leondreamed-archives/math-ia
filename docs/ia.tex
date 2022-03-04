@@ -50,9 +50,9 @@ However, not all texts are created equal. Some texts are harder to type than oth
 
 Currently, the way TypeRacer determines the difficulty of a text is through data collected from random players typing the text. If, on average, the players' speed on the text is lower than their average speed overall on other texts, then the text is classified as more difficult. If the players' speed on the text is greater than their overall speed, then the text is classified as easier to type.
 
-Unfortunately, this approach of measuring text difficulty is biased towards users of the QWERTY keyboard layout, the most popular keyboard layout. However, I use an alternative keyboard layout called Programmer Dvorak (an image can be found in Figure 12 in the Appendix). Thus, a text containing words that may be difficult for QWERTY users to type (e.g. \texttt{minimum}) might be easier for me because my keyboard keys are arranged differently.
+Unfortunately, this approach of measuring text difficulty is biased towards users of the QWERTY keyboard layout, the most popular keyboard layout. In fact, I use an alternative keyboard layout called Programmer Dvorak (an image can be found in Figure 12 in the Appendix). Thus, a text containing words that may be difficult for QWERTY users to type (e.g. \texttt{minimum}) might be easier for me because my keyboard keys are arranged differently.
 
-Thus, my goal in this exploration is to create a program that takes a certain text as input and outputs a prediction of how fast I would type the text by analyzing various characteristics of the text and correlating them with my typing speed by using my performance on past races. This program will use machine learning, which involves the use of algorithms and statistical models to analyze and detect patterns in data.
+Thus, my goal in this exploration is to create a program that takes a certain text as input and outputs a prediction of how fast I would type the text. This program would analyze various characteristics of the text and correlate them with my typing speed by using my performance on past texts with similar characteristics. This program will use machine learning, which involves the use of algorithms and statistical models to analyze and detect patterns in data.
 
 \section*{Gathering Data}
 
@@ -62,12 +62,12 @@ I created a program that automatically scrapes the race data from each of the 80
 
 \section*{Analyzing Data}
 
-To take into consideration the gradual increase in my typing speed overtime, the typing speed of a word should be measured relative to my average speed at the time. Thus, instead of using an absolute WPM measurement to measure a word's difficulty (since my average WPM changes over time), I've instead use a measurement of WPM ratio that compares the speed in WPM at which I typed the word at with my average monthly WPM at the time of typing the word:
+To take into consideration the gradual increase in my typing speed over time, the typing speed of a word should be measured relative to my average speed at the time. Thus, instead of using an absolute WPM measurement to measure a word's difficulty (since my average WPM changes over time), I've instead use a measurement of WPM ratio that compares the speed in WPM at which I typed the word at with my average monthly WPM at the time of typing the word:
 \begin{align*}
-	\text{WPM Ratio} & = \frac{\text{speed at which word was typed in WPM}}{\text{Average monthly WPM at the time of typing the word}}
+	\text{WPM Ratio} & = \frac{\text{speed at which word was typed (in WPM)}}{\text{average monthly WPM at the time of typing the word}}
 \end{align*}
 
-After analyzing the data, I noticed some outliers in the data set. Occasionally, I take a short breather in the middle of a typing race if I'm making too many mistakes, and this is reflected in some of the data as it results in abnormally low speeds for some words. To counter this problem, I decided to take the median of the WPM ratios whenever there are multiple WPM ratios for a single word from multiple texts. I decided to use the median instead of the mean as the median wouldn't be as affected by extreme data compared to the mean.
+After analyzing the data, I noticed some outliers in the data set. Occasionally, I take a short breather in the middle of a typing race if I'm making too many mistakes, and this is reflected in some of the data as it results in abnormally low speeds for some words. To counter this problem, I decided to take the median of the WPM ratios whenever there are multiple WPM ratios for a single word from multiple texts. I decided to use the median instead of the mean as the median wouldn't be as adversely affected by extreme data compared to the mean.
 
 \section*{Predicting Typing Speed}
 

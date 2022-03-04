@@ -9,6 +9,7 @@
 \usepackage{float}
 \usepackage{biblatex}
 \usepackage{minted}
+\usepackage[font=small,labelfont=bf]{caption}
 
 \addbibresource{ia.bib}
 
@@ -540,6 +541,7 @@ def get_table_2_row(w):
 % \end{noindent}
 
 \begin{table}[H]
+	\def\arraystretch{1.3}
 	\caption{Three examples of features in words.  The following data might not match with the data expected from a QWERTY layout, and that's because when analyzing my typing data, I based it off the keyboard layout that I use—the Programmer Dvorak layout (please refer to Figure 9 in the Appendix)}
 	\begin{tabularx}{\linewidth}{|
 			p{70pt}|
@@ -564,6 +566,8 @@ def get_table_2_row(w):
 		\py{get_table_1_row(word3)}
 		\\\hline
 	\end{tabularx}
+
+	\vspace{2ex}
 
 	\begin{tabularx}{\linewidth}{|
 			p{70pt}|
@@ -816,7 +820,7 @@ Then, we can add the value of $m_i$ for each word in the text to find the predic
 
 To test the accuracy of my prediction function on entire texts, I applied the above formula to predict the WPM of all texts that I typed in TypeRacer with 100\% accuracy (the texts need to have 100\% accuracy as I didn't take accuracy into account when designing the machine learning model, so it wouldn't take into account races where I type a word slow because I typed it wrong the first time):
 
-\begin{figure}
+\begin{figure}[H]
 	\caption{The predicted WPM using my prediction function $f$ compared with the actual WPM of the races}
 	\includegraphics[width=\textwidth]{predicted-vs-actual-wpm.png}
 \end{figure}
@@ -829,19 +833,28 @@ In conclusion, I was able to successfully create a machine learning algorithm th
 
 Even though I would consider my machine learning model generally successful, there is still much room for improvement. There are many more features in a word that I didn't get to analyze in this exploration. In addition, many of these features aren't necessarily linearly correlated, which would change my prediction function $f$ and my cost function $C$. However, even with these changes, I would still be able to apply gradient descent to these new functions as long as I can calculate the derivative of these non-linear correlations.
 
-Overall, I'm very proud of implementing my very first machine learning algorithm, especially using a data set that came from my own activity over the past 5 years of playing TypeRacer (who knew it would end up becoming immensely valuable for a math exploration?). I hope to apply machine learning to various other areas of my life in the future.
+Overall, I'm very proud of implementing my very first machine learning algorithm, especially using a data set that came from my own activity over the past 5 years of playing TypeRacer (who knew it would end up becoming immensely valuable for a math exploration?). I hope to apply machine learning to analyze various data from other parts of my life in the future.
+
+\newpage
+
+\section*{Works Cited}
+
+\newpage
 
 \section*{Appendix}
 
+\subsection*{Keyboard Layout}
+
+Unlike most other people in the world, I don't type on a QWERTY keyboard layout. Instead, I use the Programmer Dvorak keyboard layout—a layout based on the more-optimal Dvorak layout that's optimized for programmers:
 \begin{figure}[H]
-	\caption{The Programmer Dvorak Keyboard Layout}
+	\caption{The Programmer Dvorak Keyboard Layout. Whenever a key has two symbols, the bottom key presents the symbol that's typed without the Shift key, and the top key represents the symbol that's typed when the Shift key is held down (in this layout, Shift is required to type out numbers).}
 	\includegraphics[width=\textwidth]{programmer-dvorak.png}
 	\label{fig:programmer-dvorak}
 \end{figure}
 
-\section*{Code}
+\subsection*{Code}
 
-\subsection*{Machine Learning Implementation}
+\subsubsection*{Machine Learning Implementation}
 
 Below is the Python code I wrote that performed the calculations involved in the machine learning algorithm. Note that only the code related to mathematical calculations is included (code that isn't relevant to the machine learning calculations such as graph plotting is left out for brevity).
 \begin{minted}[fontsize=\small]{python}
@@ -1004,7 +1017,7 @@ final_weights = train(weights, features_of_words, targets)
 print("Final weights: ", final_weights)
 \end{minted}
 
-\subsection*{Predicting WPM of an Entire Text}
+\subsubsection*{Code to Predict WPM of an Entire Text}
 
 Below is the TypeScript code I've written for predicting the WPM of typing an entire text. Note that the function \code{getWordFeatures} is the function for extracting the features I'm analyzing in each word, and its implementation is omitted for the sake of brevity.
 

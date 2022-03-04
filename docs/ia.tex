@@ -7,7 +7,7 @@
 \usepackage{amsmath}
 \usepackage{ragged2e}
 \usepackage{float}
-\usepackage{biblatex}
+\usepackage[style=apa, backend=biber]{biblatex}
 \usepackage{minted}
 \usepackage[font=small,labelfont=bf]{caption}
 
@@ -823,7 +823,7 @@ While there is a lot of variation in the graph, the WPM predictions do tend to i
 
 In conclusion, I was able to successfully create a machine learning algorithm that correlated certain text features with making the text easier to type and certain text features with making the text harder to type. While the machine learning algorithm wasn't the most accurate with its predictions (i.e. there was a lot of variation), its predictions did manage to follow the general trend: on average, as the actual WPM ratios increased, the predicted WPM ratios increased as well.
 
-Even though I would consider my machine learning model generally successful, there is still much room for improvement. There are many more features affecting the typing speed of words that I didn't get to analyze in this exploration, such as the impact of words involving alternating hands and "finger rolls" that involve pressing a series of adjacent keys with different fingers in quick succession. In addition, many of these features aren't necessarily linearly correlated, which would change my prediction function $f$ and my cost function $C$. However, even with these changes, I would still be able to apply gradient descent to these new functions as long as I can calculate the derivative of these non-linear correlations.
+Even though I would consider my machine learning model generally successful, there is still much room for improvement. There are many more features affecting the typing speed of words that I didn't get to analyze in this exploration, such as the impact of words involving alternating hands and ``finger rolls'' that involve pressing a series of adjacent keys with different fingers in quick succession. In addition, many of these features aren't necessarily linearly correlated, which would change my prediction function $f$ and my cost function $C$. However, even with these changes, I would still be able to apply gradient descent to these new functions as long as I can calculate the derivative of these non-linear correlations.
 
 Overall, I'm very proud of implementing my very first machine learning algorithm, especially using a data set that came from my own activity over the past 5 years of playing TypeRacer (who knew it would end up becoming immensely valuable for a math exploration?). I hope to apply machine learning to analyze various data from other parts of my life in the future.
 
@@ -831,13 +831,17 @@ Overall, I'm very proud of implementing my very first machine learning algorithm
 
 \section*{Works Cited}
 
+\nocite{*}
+\setlength\bibitemsep{1.5\itemsep}
+\printbibliography
+
 \newpage
 
 \section*{Appendix}
 
 \subsection*{Keyboard Layout}
 
-Unlike most other people in the world, I don't type on a QWERTY keyboard layout. Instead, I use the Programmer Dvorak keyboard layout—a layout based on the more-optimal Dvorak layout that's optimized for programmers:
+Unlike most other people, I don't type on a QWERTY keyboard layout. Instead, I use the Programmer Dvorak keyboard layout—a layout based on the more-optimal Dvorak layout that's optimized for programmers:
 \begin{figure}[H]
 	\caption{The Programmer Dvorak Keyboard Layout. Whenever a key has two symbols, the bottom key presents the symbol that's typed without the Shift key, and the top key represents the symbol that's typed when the Shift key is held down (in this layout, Shift is required to type out numbers).}
 	\includegraphics[width=\textwidth]{programmer-dvorak.png}

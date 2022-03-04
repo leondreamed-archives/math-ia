@@ -157,7 +157,7 @@ def parse_words(word_stats):
 
         features_of_words.append(features_of_word)
 
-    weights = [0 for feature in range(num_features)]
+    weights = [0.07311495969483332, -0.0028186947235569818, -0.08877689002860091, 0.028094111731677158, 0.0012641055456418648, 0.052527604782829265, 0.0, 0.07245468463395333, -0.1839770389811332, -0.07200872659410296, 1.252027666632455]
 
     return targets, features_of_words, weights
 

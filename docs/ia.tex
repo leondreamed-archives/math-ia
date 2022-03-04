@@ -768,8 +768,8 @@ Using the above vector equations, I've implemented a Python program that process
 
 As expected, the cost vs. iteration graph shows the cost decreasing as more iterations are performed:
 \begin{figure}[H]
-	\caption{The graph of cost $C(\vec{W})$ vs. iteration number.}
-	\includegraphics{cost.png}
+	\caption{The graph of iteration number versus cost ($C(\vec{W})$) plotted on a logarithmic scale.}
+	\includegraphics[width=1\textwidth]{cost.png}
 \end{figure}
 
 To see how accurate my predictions were visually, I plotted a point for each text: one point that represented the predicted WPM Ratio from my equation and one point that represented the actual WPM Ratio for that text. When plotting this graph, I sorted all the texts by their WPM Ratio so that it's easier to see how my prediction function compares against the actual values:
@@ -778,6 +778,16 @@ To see how accurate my predictions were visually, I plotted a point for each tex
 	\caption{A graph of text number vs. WPM Ratio with the orange dots representing predictions from my prediction function and the green dots representing the actual WPM Ratio values of a word.}
 	\includegraphics[width=\textwidth]{predictions.png}
 \end{figure}
+
+The general pattern of the predicted WPM ratios matches the general pattern of the graph: as the actual WPM ratios increase, the predicted WPM ratios also tend to increase. However, there is a lot of deviation between the predicted WPM ratio and the actual WPM ratio, indicating that there are likely more factors that influence typing speed that I haven't taken into account.
+
+On the left side of the graph in Figure 10, there are a lot more predictions that match up with the low WPM ratio values. However, on the right side of the graph, there are fewer predictions that accurately predict the high WPM ratio values. This indicates that my prediction function is better at predicting the typing speed for difficult words, but worse at predicting the typing speed for easier words.
+
+Based on the features I analyzed, I believe that this bias towards more accurate predictions for difficult words was expected: a lot of the features that I analyzed, like the number of capital letters and the number of consecutive same-finger letters, are distinct features of difficult-to-type words. For words that are easier to type, there are many features that I didn't consider because it was harder to assign a numerical value for these features, like how much the word alternates between fingers on the right and left hand or the extent to which the word can be typed using "finger rolls" (when multiple separate fingers press adjacent letters in quick succession, like typing \code{lime} on QWERTY).
+
+In addition, for my prediction algorithm, I assumed that all the features were linearly correlated with the WPM ratio for simplicity. However, this may not necessarily be the case. For example, a word with more than one capital letter is significantly more difficult to type than a word with only one capital letter, indicating a non-linear correlation.
+
+\section*{Conclusion}
 
 \section*{Appendix}
 

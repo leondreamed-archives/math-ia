@@ -42,8 +42,6 @@ Your score at the end of the race is a measurement of your average typing speed 
 
 However, not all texts are created equal. Some texts are harder to type than others, whether it's from having longer words, frequent capital letters, etc.
 
-In TypeRacer, your average score (typing speed) from the last 10 rounds you've played determines the types of texts you'll be presented with. A lower average typing speed causes you to encounter easier texts, while a higher average typing speed gives you more difficult texts:
-
 \begin{figure}[H]
 	\caption{Two different possible texts in TypeRacer. On the left, an easy text, and on the right, a more difficult text.}
 	\includegraphics[width=0.5\textwidth]{easy-text.png}
@@ -52,26 +50,24 @@ In TypeRacer, your average score (typing speed) from the last 10 rounds you've p
 
 Currently, the way TypeRacer determines the difficulty of a text is through data collected from random players typing the text. If, on average, the players' speed on the text is lower than their average speed overall on other texts, then the text is classified as more difficult. If the players' speed on the text is greater than their overall speed, then the text is classified as easier to type.
 
-While this approach works well for TypeRacer, there are other scenarios where it would be better to predict a text's difficulty without needing to collect data from users to accurately determine how difficult a text is to type. For example, other typing sites may not have as large of a user base as TypeRacer, and they may need to manually classify the difficulty of various texts, which can be time-consuming. In addition, the text difficulty calculated by TypeRacer is an average of the performance of all TypeRacer players. This is a problem because it is biased towards users of the QWERTY keyboard layout, since that's the most popular keyboard layout. However, I don't use the QWERTY layout, but rather a modification of the less-popular Dvorak layout called Programmer Dvorak (refer to Figure 12 in the Appendix for an image of the layout). Thus, a word that may be difficult for QWERTY users to type (e.g. \texttt{minimum}) might be easier for me because my keys are arranged differently.
+Unfortunately, this approach of measuring text difficulty is biased towards users of the QWERTY keyboard layout, the most popular keyboard layout. However, I use an alternative keyboard layout called Programmer Dvorak (an image can be found in Figure 12 in the Appendix). Thus, a text containing words that may be difficult for QWERTY users to type (e.g. \texttt{minimum}) might be easier for me because my keyboard keys are arranged differently.
 
-Thus, my goal in this exploration is to create a program that takes a certain text as input and outputs a prediction of how fast I would type the text by analyzing various characteristics of the text and correlating them with typing speed by using my performance on past races. This program will use machine learning, which involves the use of algorithms and statistical models to analyze and detect patterns in data. But, in order to apply machine learning, I first need to collect data that would be analyzed by machine learning.
+Thus, my goal in this exploration is to create a program that takes a certain text as input and outputs a prediction of how fast I would type the text by analyzing various characteristics of the text and correlating them with my typing speed by using my performance on past races. This program will use machine learning, which involves the use of algorithms and statistical models to analyze and detect patterns in data.
 
 \section*{Gathering Data}
 
-In order to create a machine learning algorithm that predicts how fast I can type a certain text based on the text features, we need to collect a large amount of data that includes various texts and the speed at which I type them. Luckily, I've been active on TypeRacer for over 5 years now, and over these 5 years I've typed over 8000 texts on my account.
+In order to create a machine learning algorithm that predicts how fast I can type a certain text, I need to collect a large amount of data that includes various texts and the speed at which I type them. Luckily, I've been active on TypeRacer for over 5 years now, and over these 5 years I've typed over 8000 texts on my account.
 
-I created a program that automatically scrapes the race data from each of my 8000+ texts. Since TypeRacer doesn't have an official way to collect this data, I had to use web scraping that retrieved the entire web page for each of my 8000+ races. Each web page contained a typing log that included the exact time I pressed each keystroke, which is crucial so that I can measure the typing speed of each individual word.
-
-I decided that for the scope of this exploration, I will only be using words that I've typed with 100\% accuracy (in other words, typed without making any mistakes). This is because accuracy is a fairly random measurement: just because I typed a word inaccurately once doesn't mean that the word is necessarily harder to type—it might have just been "bad luck." Thus, in my data, I filtered out all the words that I didn't type perfectly and was left with 20454 unique words.
+I created a program that automatically scrapes the race data from each of the 8000+ texts I've typed. I decided that for the scope of this exploration, I will only be using words that I've typed with 100\% accuracy (in other words, without making any mistakes). This is because accuracy is a fairly random measurement: just because I typed a word inaccurately once doesn't mean that the word is necessarily harder to type—it might have just been bad luck. After filtered out all the words that I didn't type perfectly, I was left with 20454 unique words to analyze.
 
 \section*{Analyzing Data}
 
-Thus, to take into consideration the gradual increase in my typing speed overtime, the typing speed of a word should be measured relative to my average speed at the time. Thus, instead of using WPM to measure a word's difficulty (since my average WPM changes over time), I've instead use a measurement of WPM ratio that compares the speed in WPM at which I typed the word at with my average monthly WPM at the time of typing the word:
+To take into consideration the gradual increase in my typing speed overtime, the typing speed of a word should be measured relative to my average speed at the time. Thus, instead of using an absolute WPM measurement to measure a word's difficulty (since my average WPM changes over time), I've instead use a measurement of WPM ratio that compares the speed in WPM at which I typed the word at with my average monthly WPM at the time of typing the word:
 \begin{align*}
 	\text{WPM Ratio} & = \frac{\text{speed at which word was typed in WPM}}{\text{Average monthly WPM at the time of typing the word}}
 \end{align*}
 
-After analyzing the data, I noticed some outliers in the data set. Occasionally, I take a short breather in the middle of a typing race if I'm making too many mistakes, and this is reflected in some of the data as it causes my algorithm to calculate abnormally low speeds for some words. To counter this problem, I decided to take the median of the WPM ratios whenever there are multiple WPM ratios for a single word (as a result of typing the same text multiple times or the word appearing in multiple different texts). I decided to use the median instead of the mean as the median wouldn't be as affected by outlier data compared to the mean.
+After analyzing the data, I noticed some outliers in the data set. Occasionally, I take a short breather in the middle of a typing race if I'm making too many mistakes, and this is reflected in some of the data as it results in abnormally low speeds for some words. To counter this problem, I decided to take the median of the WPM ratios whenever there are multiple WPM ratios for a single word from multiple texts. I decided to use the median instead of the mean as the median wouldn't be as affected by extreme data compared to the mean.
 
 \section*{Predicting Typing Speed}
 
@@ -139,28 +135,28 @@ def get_table():
 
 Even though these words are short, they contain capital letters and keys that need you to press the Shift key to type (\code{"} and \code{?}). This makes the word substantially slower to type, and isn't accounted for in Equation 1, which only considers the length of the word.
 
-Thus, our WPM Ration prediction function must take into account various features of the word that would affect typing speed. Some features, like the number of capital letters, will influence the word's typing speed more compared to other features, like whether the word starts with a vowel or a consonant.
+Thus, our WPM Ratio prediction function must take into account various features of the word that would affect typing speed. Some features, like the number of capital letters, will influence the word's typing speed more compared to other features, like whether the word starts with a vowel or a consonant.
 
 To account for the different influences of different features, we need to assign a different weight to each of them in our equation, which gives us an equation similar to the following:
 \begin{align*}
 	\text{WPM Ratio} = w_1 \times (\text{Feature 1}) + w_2 \times (\text{Feature 2}) + \dots + \text{Bias}
 \end{align*}
 
-For example, if the only two features that influence the difficulty of a are the length of the word and the number of capital letters in the word, then the equation would become:
+For example, if the only two features that influence the difficulty of a are the length of the word and the number of capital letters in the word, then the equation becomes:
 \begin{align*}
 	\text{WPM Ratio} = w_{\text{word length}} \times (\text{word length}) + w_{\text{\# of capital letters}} \times (\text{\# of capital letters}) + \text{Bias}
 \end{align*}
 
 In this equation, $w_{\text{word length}}$ isn't necessarily the same as $w_{\text{capital letters}}$. For example, if the magnitude of $w_{\text{word length}}$ is greater than $w_{\text{capital letters}}$, it means that the length of a word has more influence on the WPM ratio compared to the number of capital letters in the word.
 
-Let us define the WPM Ratio as a function that takes in a word $\text{Word}_i$ as input and returns the sum of the feature weights multiplied with the feature values of $\text{Word}_i$. If $w_i$ represents the weight for feature $i$, $x_{f_i}$ represents the feature value for feature $f$ of word $i$, and $b$ represents the bias term, then our WPM ratio equation can be written as:
+Let us define our prediction function $f$ as a function that takes in a word $\text{Word}_i$ as input and returns the sum of the weights for each feature multiplied with the feature values of $\text{Word}_i$. The output of $f$ is our predicted WPM ratio for a certain word. If $w_i$ represents the weight for feature $i$, $x_{f_i}$ represents the feature value for feature $f$ of word $i$, and $b$ represents the bias term, then our WPM ratio equation can be written as:
 \begin{align*}
 	f(\text{Word}_i) & = w_1{x_1}_i + w_2{x_2}_i + \dots + w_n{x_n}_i + b
 	\\
 	f(\text{Word}_i) & = \Big(\sum_{f=1}^{n} w_f{x_f}_i\Big) + b
 \end{align*}
 
-In this equation, $f$ is our prediction function: given a word, it predicts the WPM ratio of the word based on its features. To create an accurate prediction function, we need to find optimal values of $w_f$ that will give us predicted WPM ratios that are as close as possible to actual WPM ratios from our data. To find optimal values of $w_f$, we need to use a cost function that gives us a measure of how accurate our current values for $w_f$ are.
+To create an accurate prediction function, we need to find optimal values of $w_f$ that will give us predicted WPM ratios that are as close as possible to actual WPM ratios from our data. To find optimal values of $w_f$, we need to use a cost function that gives us a measure of how accurate our current values for $w_f$ are.
 
 \subsection*{The Cost Function}
 
@@ -217,7 +213,7 @@ def f3f(number):
 	\end{tabularx}
 \end{table}
 
-For a linear prediction function $f(\text{Word}_i) = w_1x_1 + b$, the cost function can be represented graphically as the sum of the squared lengths of the red lines in the graphs below:
+For a linear prediction function $f(\text{Word}_i) = w_1x_1 + b$, the cost function can be represented graphically as the sum of the squared lengths of the red lines in the graph below:
 
 \begin{figure}[H]
 	\centering
@@ -225,7 +221,7 @@ For a linear prediction function $f(\text{Word}_i) = w_1x_1 + b$, the cost funct
 	\includegraphics[width=\linewidth]{cost-visualization.png}
 \end{figure}
 
-The goal of our machine learning algorithm is to minimize the cost function: to find a set of weights for our prediction function $f$ such that $C(f)$ is as low as possible. A popular method for minimizing cost is by using gradient descent.
+The goal of our machine learning algorithm is to minimize this cost function: to find a set of weights for our prediction function $f$ such that $C(f)$ is as low as possible. A popular method for minimizing cost is by using gradient descent.
 
 \subsection*{Gradient Descent}
 
@@ -264,7 +260,7 @@ To visualize this cost function, we can use a 3D graph where the x-axis correlat
 	\includegraphics[width=\linewidth]{3d-plot.png}
 \end{figure}
 
-The goal of our machine learning algorithm is to minimize this cost function. In other words, our goal is to find the minimum on the graph of $C(w_1, b)$. To find the minimum, we need to use the derivatives of $C(w_1, b)$. In particular, since our cost function has more than one variable, $w_1$ and $b$, we need to use partial derivatives.
+The goal of our machine learning algorithm is to find the minimum on the graph of $C(w_1, b)$. To find the minimum, we need to use the derivatives of $C(w_1, b)$. Since our cost function has more than one variable, $w_1$ and $b$, we need to use partial derivatives.
 
 \subsection*{Partial Derivatives}
 
@@ -393,7 +389,7 @@ This process is repeated for each partial derivative. For example, with our curr
 
 In this case, since $\frac{dC}{db}$ is negative when $b = \py{bias}$, it indicates that increasing $b$ will decrease the cost. This means that our current value of $b$ is below the optimal value of $b$, and that we should increase it to minimize the cost.
 
-After we know for each variable whether we should increase it or decrease it, the hyperparameter that determines how much we increase/decrease each variable by is called the learning rate, $\eta$. To find the new weight, $w_1'$, we add the current weight $w_1$ to the learning rate times the negative gradient. We use the negative gradient so that when our gradient is positive, we decrease the variable to decrease our cost, and when our gradient is negative, we increase the variable to decrease our cost:
+The hyperparameter that determines how much we increase/decrease each variable by is called the learning rate, $\eta$. To find the new weight, $w_1'$, we add the current weight $w_1$ to the learning rate times the negative gradient. We use the negative gradient so that when our gradient is positive, we decrease the variable to decrease our cost, and when our gradient is negative, we increase the variable to decrease our cost:
 {
 \setlength{\abovedisplayskip}{0pt}
 \setlength{\belowdisplayskip}{0pt}
@@ -456,7 +452,7 @@ For example, if we set $\eta$ equal to \py{learning_rate}, then the new values f
 \end{center}
 }
 
-One limitation with gradient descent is that by using gradient descent, it's possible for the machine learning model to converge at a local minimum for the cost function instead of arriving at the global minimum. However, in practice, the local minimum of complex cost functions are generally close to the global minimum, which is why gradient descent remains a popular method to minimizing the cost function in machine learning models.
+One limitation with gradient descent is that it's possible for the machine learning model to converge at a local minimum for the cost function instead of arriving at the global minimum. However, in practice, the local minimum of complex cost functions are generally close to the global minimum, which is why gradient descent remains a popular method to minimizing the cost function in machine learning models.
 
 However, how do we know what value of $\eta$ we should use? In other words, how much should increase or decrease $w_1$ by? If we increase/decrease the weight by too much, we could end up in a position of higher loss than we were before. If we move increase/decrease the weight too slowly, it will take a long time before we find the minimum:
 
@@ -466,7 +462,7 @@ However, how do we know what value of $\eta$ we should use? In other words, how 
 	\includegraphics[width=\linewidth]{learning-rate.png}
 \end{figure}
 
-The optimal choice of $\eta$ will vary for different situations, but there are heuristics that can help. When the learning rate is too high, the cost function will increase infinitely, so whenever it happens in practice you would decrease the learning rate by an order of magnitude.
+The optimal choice of $\eta$ will vary for different situations, but there are heuristics that can help. When the learning rate is too high, the cost function will increase infinitely, indicating that the learning rate should be decreased by an order of magnitude. In my case, I simply monitored the cost after each iteration and used trial-and-error to find an optimal learning rate.
 
 I created a Python program to run the above calculations for the values in Table 2 until the difference between $C(w_1, b)$ and $C(w_1', b')$ was less than $10^-9$, indicating that the machine learning model had converged. I set the learning rate $\eta$ to 0.01, and after 8341 iterations, the program outputted the following values for $w_1$ and $b$ (to 9 decimal places):
 \begin{align}
@@ -491,10 +487,11 @@ In my program, I've also tracked the value of the cost function $C(w_1, b)$ afte
 However, as indicated by the graph in Figure 3, the WPM ratio isn't just correlated with the word length. Thus, we need to apply our machine learning algorithms for a prediction function that takes into account more features in addition to the word length.
 
 \subsection*{Analyzing More Features}
+
 There are many characteristics of a word that can affect its WPM ratio. Below is a list of features that I will be analyzing and using in creating an accurate prediction function for predicting the WPM ratio of a word:
 
 \begin{itemize}
-	\item The number of characters in the word.
+	\item The number of characters in the word (word length).
 	\item The number of capital letters in the word.
 	\item The amount of times the same finger is used to type consecutive letters in the word. For example, the word ``mummy'' requires using the right index finger five times in a row on a QWERTY keyboard.
 	\item The number of sets of ``double letters'' in the word. For example, the word ``sheep'' has 1 set of double letters, and the word ``bittersweet'' has two sets of double letters.
@@ -783,10 +780,6 @@ The general pattern of the predicted WPM ratios matches the general pattern of t
 
 On the left side of the graph in Figure 10, there are a lot more predictions that match up with the low WPM ratio values. However, on the right side of the graph, there are fewer predictions that accurately predict the high WPM ratio values. This indicates that my prediction function is better at predicting the typing speed for difficult words, but worse at predicting the typing speed for easier words.
 
-Based on the features I analyzed, I believe that this bias towards more accurate predictions for difficult words was expected: a lot of the features that I analyzed, like the number of capital letters and the number of consecutive same-finger letters, are distinct features of difficult-to-type words. For words that are easier to type, there are many features that I didn't consider because it was harder to assign a numerical value for these features, like how much the word alternates between fingers on the right and left hand or the extent to which the word can be typed using "finger rolls" (when multiple separate fingers press adjacent letters in quick succession, like typing \code{lime} on QWERTY).
-
-In addition, for my prediction algorithm, I assumed that all the features were linearly correlated with the WPM ratio for simplicity. However, this may not necessarily be the case. For example, a word with more than one capital letter is significantly more difficult to type than a word with only one capital letter, indicating a non-linear correlation.
-
 \section*{Creating the WPM Prediction Program}
 
 My prediction function $f$ tells me how fast I can type a single word, but I want to create a program that can tell me how fast I would be able to type an entire text that consists of multiple words.
@@ -828,9 +821,9 @@ While there is a lot of variation in the graph, the WPM predictions do tend to i
 
 \section*{Conclusion}
 
-In conclusion, I was able to successfully create a machine learning algorithm that correlated certain text features with making the text easier to type and certain text features with making the text harder to type. While the machine learning algorithm wasn't the most accurate with its predictions (i.e. there was a lot of variation), its predictions did manage to follow the general trend: on average, as the actual WPM Ratios increased, the predicted WPM Ratios increased as well.
+In conclusion, I was able to successfully create a machine learning algorithm that correlated certain text features with making the text easier to type and certain text features with making the text harder to type. While the machine learning algorithm wasn't the most accurate with its predictions (i.e. there was a lot of variation), its predictions did manage to follow the general trend: on average, as the actual WPM ratios increased, the predicted WPM ratios increased as well.
 
-Even though I would consider my machine learning model generally successful, there is still much room for improvement. There are many more features in a word that I didn't get to analyze in this exploration. In addition, many of these features aren't necessarily linearly correlated, which would change my prediction function $f$ and my cost function $C$. However, even with these changes, I would still be able to apply gradient descent to these new functions as long as I can calculate the derivative of these non-linear correlations.
+Even though I would consider my machine learning model generally successful, there is still much room for improvement. There are many more features affecting the typing speed of words that I didn't get to analyze in this exploration, such as the impact of words involving alternating hands and "finger rolls" that involve pressing a series of adjacent keys with different fingers in quick succession. In addition, many of these features aren't necessarily linearly correlated, which would change my prediction function $f$ and my cost function $C$. However, even with these changes, I would still be able to apply gradient descent to these new functions as long as I can calculate the derivative of these non-linear correlations.
 
 Overall, I'm very proud of implementing my very first machine learning algorithm, especially using a data set that came from my own activity over the past 5 years of playing TypeRacer (who knew it would end up becoming immensely valuable for a math exploration?). I hope to apply machine learning to analyze various data from other parts of my life in the future.
 

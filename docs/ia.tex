@@ -456,8 +456,8 @@ However, how do we know what value of $\eta$ we should use? In other words, how 
 % TODO
 \begin{figure}[H]
 	\centering
-	\caption{TODO: Increasing by too much would overshoot the local minimum; increasing by too little would take too long to reach the local minimum.}
-	\includegraphics[width=\linewidth]{todo.png}
+	\caption{Increasing by too much would overshoot the local minimum; increasing by too little would take too long to reach the local minimum.}
+	\includegraphics[width=\linewidth]{learning-rate.png}
 \end{figure}
 
 The optimal choice of $\eta$ will vary for different situations, but there are heuristics that can help. When the learning rate is too high, the cost function will increase infinitely, so whenever it happens in practice you would decrease the learning rate by an order of magnitude.
@@ -471,9 +471,8 @@ I created a Python program to run the above calculations for the values in Table
 If we substitute these values for $w_1$ and $b$ into our prediction function $f$ and plot our function on a graph alongside the data from Table 2, we obtain the following graph:
 \begin{figure}[H]
 	\centering
-	\caption{TODO: A graph of our prediction function $f$ using the values from equation 1}
-	% TODO: plot the function in Excel
-	\includegraphics{todo.png}
+	\caption{A graph of our prediction function $f$ using the values from Equations 1 and 2.}
+	\includegraphics[width=\textwidth]{word-length-vs-wpm-ratio.png}
 \end{figure}
 
 In my program, I've also tracked the value of the cost function $C(w_1, b)$ after each iteration. Plotting the cost against the iteration number gives us the following graph:
@@ -776,7 +775,40 @@ Based on the features I analyzed, I believe that this bias towards more accurate
 
 In addition, for my prediction algorithm, I assumed that all the features were linearly correlated with the WPM ratio for simplicity. However, this may not necessarily be the case. For example, a word with more than one capital letter is significantly more difficult to type than a word with only one capital letter, indicating a non-linear correlation.
 
+\section*{Creating the WPM Prediction Program}
+
+My prediction function $f$ tells me how fast I can type a single word, but I want to create a program that can tell me how fast I would be able to type an entire text that consists of multiple words.
+
+Luckily, I can use my prediction function to output a predicted WPM ratio for each word, and I can combine the WPM ratio of each word in the text to arrive at a final WPM prediction for the entire text.
+
+The WPM of an entire text is calculated by the number of words in the phrase (and since a word is defined as 5 characters, it's equivalent to one-fifth the number of characters in the text) divided by the minutes it takes to type. It's easy to find the number of characters in the text, so I just need to find how long it would take for me to type the text based using the outputs of my prediction function $f$.
+
+Since the prediction function only works on words, we can apply the prediction function on each word in the text. Then, we can convert the WPM ratio for each word into how long it would take for me to type the word using the following equations:
+\begin{align*}
+f(\text{Word}_i) & = \text{WPM Ratio}_i
+\\
+\text{WPM Ratio}_i * \text{Average WPM} & = x~\frac{\text{words}}{\text{minute}}
+\\
+x~\frac{\text{words}}{\text{minute}} \times 5 \frac{\text{characters}}{\text{word}} & = 5x \frac{\text{characters}}{\text{minute}}
+\\
+& = \frac{1}{5x} \frac{\text{minutes}}{\text{character}}
+\\
+\text{\# minutes to type}~\text{Word}_i = m_i & = \frac{1}{5x} * Length(\text{Word}_i)
+\end{align*}
+
+Then, we can add the value of $m_i$ for each word in the text to find the predicted total number of minutes to type the entire text. By combining this with the number of words in the text, we can calculate the predicted WPM of typing the entire text:
+\begin{align*}
+	\text{Total minutes to type text} & = \sum_{i=1}^{\text{\# of words}} m_i
+	\\
+	\text{\# words in text} & = \frac{Length(\text{Word}_i)}{5}
+	\\
+	\text{WPM of Text} & = \frac{\text{Total minutes to type text}}{\text{\# words in text}}
+\end{align*}
+
+
 \section*{Conclusion}
+
+TODO
 
 \section*{Appendix}
 
@@ -786,9 +818,11 @@ In addition, for my prediction algorithm, I assumed that all the features were l
 	\label{fig:programmer-dvorak}
 \end{figure}
 
-\subsection*{Python Code}
+\section*{Code}
 
-Below is the Python code I wrote that performed the calculations involved in the machine learning algorithm. Note that only the code related to mathematical calculations are included (Code that isn't relevant to the machine learning calculations such as graph plotting is left out for brevity).
+\subsection*{Machine Learning Implementation}
+
+Below is the Python code I wrote that performed the calculations involved in the machine learning algorithm. Note that only the code related to mathematical calculations is included (code that isn't relevant to the machine learning calculations such as graph plotting is left out for brevity).
 \begin{minted}[fontsize=\small]{python}
 import functools
 from pathlib import Path
@@ -947,6 +981,82 @@ targets, features_of_words, weights = parse_words(word_stats)
 
 final_weights = train(weights, features_of_words, targets)
 print("Final weights: ", final_weights)
+\end{minted}
+
+\subsection*{Predicting WPM of an Entire Text}
+
+Below is the TypeScript code I've written for predicting the WPM of typing an entire text. Note that the function \code{getWordFeatures} is the function for extracting the features I'm analyzing in each word, and its implementation is omitted for the sake of brevity.
+
+\begin{minted}[fontsize=\small]{typescript}
+import inquirer from 'inquirer';
+import { getWordFeatures } from '~/utils/features.js';
+
+const finalWeights = [
+	-0.07200872660362857, // word_length
+	-0.0028186947204240816, // num_capital_letters
+	-0.0887768900289833, // num_consecutive_fingers
+	0.028094111732003876, // num_double_letters
+	0.0012641055456548735, // num_home_row_letters
+	0.05252760479202044, // num_left_hand_letters
+	0.07245468464334391, // num_right_hand_letters
+	-0.18397703898381226, // num_shifted_letters
+	0.07311495969371014, // is_word_common
+	1.252027666643374, // bias
+];
+
+function calculateWPMRatio(word: string) {
+	const features = getWordFeatures(word);
+
+	const {
+		isWordCommon,
+		numCapitalLetters,
+		numConsecutiveFingers,
+		numDoubleLetters,
+		numHomeRowLetters,
+		numLeftHandLetters,
+		numRightHandLetters,
+		numShiftedLetters,
+		wordLength,
+	} = features;
+
+	return (
+		wordLength * finalWeights[0]! +
+		numCapitalLetters * finalWeights[1]! +
+		numConsecutiveFingers * finalWeights[2]! +
+		numDoubleLetters * finalWeights[3]! +
+		numHomeRowLetters * finalWeights[4]! +
+		numLeftHandLetters * finalWeights[5]! +
+		numRightHandLetters * finalWeights[6]! +
+		numShiftedLetters * finalWeights[7]! +
+		isWordCommon * finalWeights[8]! +
+		finalWeights[9]!
+	);
+}
+
+// My average typing speed during February 2022
+const averageWpm = 144.7;
+
+const { text } = await inquirer.prompt<{ text: string }>({
+	name: 'text',
+	message: 'Please enter a text:',
+	type: 'input',
+});
+
+const wordsWithoutSpaces = text.split(' ');
+// Appending a space to each word except the last
+const words = wordsWithoutSpaces.map((word, i) =>
+	i === wordsWithoutSpaces.length ? word : word + ' '
+);
+
+let totalMinutes = 0;
+for (const word of words) {
+	const timeMinutes =
+		1 / ((calculateWPMRatio(word) * (averageWpm * 5)) / word.length);
+	totalMinutes += timeMinutes;
+}
+
+const finalWpm = text.length / 5 / totalMinutes;
+console.log("The predicted WPM of this text is:", finalWpm);
 \end{minted}
 
 \end{document}

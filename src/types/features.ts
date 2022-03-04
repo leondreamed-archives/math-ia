@@ -16,3 +16,4 @@ export type WordFeatures = {
 	wordLength: number;
 	numConsecutiveFingers: number;
 };
+

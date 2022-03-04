@@ -11,6 +11,8 @@
 	},
 	"type": "module",
 	"scripts": {
+		"predict-word": "node-ts ./src/bin/predict-wpm-word.ts",
+		"predict-text": "node-ts ./src/bin/predict-wpm-text.ts",
 		"prepare": "lion-git-hooks",
 		"start": "node-ts ./src/index.ts",
 		"test": "NODE_OPTIONS=--experimental-vm-modules jest",
@@ -20,7 +22,8 @@
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^16.2.1",
-		"@leonzalion/configs": "^1.1.2",
+		"@leonzalion/configs": "^1.1.4",
+		"@types/inquirer": "^8.2.0",
 		"@types/jest": "^27.4.1",
 		"@types/jsonlines": "^0.1.1",
 		"@types/lodash": "^4.14.179",
@@ -56,6 +59,7 @@
 		"dayjs": "^1.10.7",
 		"desm": "^1.2.0",
 		"got": "^12.0.1",
+		"inquirer": "^8.2.0",
 		"js-jsonl": "^1.0.3",
 		"jsonlines": "^0.1.1",
 		"lodash": "^4.17.21",

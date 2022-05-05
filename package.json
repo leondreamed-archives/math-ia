@@ -18,7 +18,7 @@
 		"test": "NODE_OPTIONS=--experimental-vm-modules jest",
 		"lint": "eslint --cache --fix .",
 		"prettier": "prettier --write src",
-		"tc": "tsc --noEmit"
+		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^16.2.4",
